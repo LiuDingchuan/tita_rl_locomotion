@@ -30,37 +30,37 @@
 
 namespace hw_broadcaster
 {
-const auto kUninitializedValue = std::numeric_limits<double>::quiet_NaN();
+  const auto kUninitializedValue = std::numeric_limits<double>::quiet_NaN();
 
-class HwBroadcasterNode : public rclcpp::Node
-{
-public:
-  explicit HwBroadcasterNode(const rclcpp::NodeOptions & option);
-  ~HwBroadcasterNode() = default;
+  class HwBroadcasterNode : public rclcpp::Node
+  {
+  public:
+    explicit HwBroadcasterNode(const rclcpp::NodeOptions &option);
+    ~HwBroadcasterNode() = default;
 
-private:
-  void pub_cb();
-  void pub5hz_cb();
-  rclcpp::TimerBase::SharedPtr timer_, timer5hz_;
-  std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Imu>> imu_pb_;
-  std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::JointState>> joint_states_pb_;
-  std::shared_ptr<rclcpp::Publisher<diagnostic_msgs::msg::DiagnosticArray>> motors_status_pb_;
-  std::shared_ptr<rclcpp::Publisher<std_msgs::msg::String>> robot_status_pb_;
+  private:
+    void pub_cb();
+    void pub5hz_cb();
+    rclcpp::TimerBase::SharedPtr timer_, timer5hz_;
+    std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Imu>> imu_pb_;
+    std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::JointState>> joint_states_pb_;
+    std::shared_ptr<rclcpp::Publisher<diagnostic_msgs::msg::DiagnosticArray>> motors_status_pb_;
+    std::shared_ptr<rclcpp::Publisher<std_msgs::msg::String>> robot_status_pb_;
 
-  std::shared_ptr<realtime_tools::RealtimePublisher<sensor_msgs::msg::Imu>> realtime_imu_pb_;
-  std::shared_ptr<realtime_tools::RealtimePublisher<sensor_msgs::msg::JointState>>
-    realtime_joint_states_pb_;
-  std::shared_ptr<realtime_tools::RealtimePublisher<diagnostic_msgs::msg::DiagnosticArray>>
-    realtime_motors_status_pb_;
-  std::shared_ptr<realtime_tools::RealtimePublisher<std_msgs::msg::String>>
-    realtime_robot_status_pb_;
+    std::shared_ptr<realtime_tools::RealtimePublisher<sensor_msgs::msg::Imu>> realtime_imu_pb_;
+    std::shared_ptr<realtime_tools::RealtimePublisher<sensor_msgs::msg::JointState>>
+        realtime_joint_states_pb_;
+    std::shared_ptr<realtime_tools::RealtimePublisher<diagnostic_msgs::msg::DiagnosticArray>>
+        realtime_motors_status_pb_;
+    std::shared_ptr<realtime_tools::RealtimePublisher<std_msgs::msg::String>>
+        realtime_robot_status_pb_;
 
-private:
-  std::unique_ptr<tita_robot> robot_;
-  std::vector<std::string> joint_names_ = {
-    "joint_left_leg_1",  "joint_left_leg_2",  "joint_left_leg_3",  "joint_left_leg_4",
-    "joint_right_leg_1", "joint_right_leg_2", "joint_right_leg_3", "joint_right_leg_4"};
-};
-}  // namespace hw_broadcaster
+  private:
+    std::unique_ptr<tita_robot> robot_;
+    std::vector<std::string> joint_names_ = {
+        "left_hip_joint", "left_knee_joint", "left_wheel_joint",
+        "right_hip_joint", "right_knee_joint", "right_wheel_joint"};
+  };
+} // namespace hw_broadcaster
 
-#endif  // HW_BROADCASTER__HW_BROADCASTER_NODE_HPP_
+#endif // HW_BROADCASTER__HW_BROADCASTER_NODE_HPP_

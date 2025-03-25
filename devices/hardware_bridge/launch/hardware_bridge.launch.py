@@ -55,7 +55,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "yaml",
-            default_value="tita_controllers_ros2_control.yaml",
+            default_value="diablo_pluspro_controllers.yaml",
             description="Select yaml file in locomotion_bringup/config",
         )
     )
@@ -66,7 +66,7 @@ def generate_launch_description():
     # Initialize Arguments
     # save urdf
     robot_description_content_dir = PathJoinSubstitution(
-        [FindPackageShare("tita_description"), "tita" , "xacro",  LaunchConfiguration('urdf')]
+        [FindPackageShare("tita_description"), "diablo_pluspro_stand" , "xacro",  LaunchConfiguration('urdf')]
     )
     xacro_executable = FindExecutable(name="xacro")
 
