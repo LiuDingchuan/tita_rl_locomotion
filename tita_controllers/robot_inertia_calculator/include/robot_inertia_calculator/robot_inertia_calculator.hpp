@@ -90,6 +90,7 @@ namespace tita_locomotion
   private:
     void armModelInit();
     void titaModelInit();
+    void diabloPlusProModelInit();
     void addExtraBodyInBase();
     void removeExtraBodyInBase();
 
