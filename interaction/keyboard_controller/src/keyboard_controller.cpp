@@ -1,29 +1,30 @@
 #include "keyboard_controller/keyboard_controller.hpp"
 
-KeyboardControllerNode::KeyboardControllerNode(const rclcpp::NodeOptions & options) : Node("keyboard_controller", options)
+KeyboardControllerNode::KeyboardControllerNode(const rclcpp::NodeOptions &options) : Node("keyboard_controller", options)
 {
   this->cmd_vel_publisher_ =
-    this->create_publisher<geometry_msgs::msg::Twist>(tita_topic::manager_twist_command, 10);
+      this->create_publisher<geometry_msgs::msg::Twist>(tita_topic::manager_twist_command, 10);
   this->posestamped_publisher_ =
-    this->create_publisher<geometry_msgs::msg::PoseStamped>(tita_topic::manager_pose_command, 10);
+      this->create_publisher<geometry_msgs::msg::PoseStamped>(tita_topic::manager_pose_command, 10);
   this->fsm_goal_publisher_ =
-    this->create_publisher<std_msgs::msg::String>(tita_topic::manager_key_command, 10);
+      this->create_publisher<std_msgs::msg::String>(tita_topic::manager_key_command, 10);
   realtime_cmd_vel_publisher_ =
-    std::make_shared<realtime_tools::RealtimePublisher<geometry_msgs::msg::Twist>>(
-      cmd_vel_publisher_);
+      std::make_shared<realtime_tools::RealtimePublisher<geometry_msgs::msg::Twist>>(
+          cmd_vel_publisher_);
   realtime_posestamped_publisher_ =
-    std::make_shared<realtime_tools::RealtimePublisher<geometry_msgs::msg::PoseStamped>>(
-      posestamped_publisher_);
+      std::make_shared<realtime_tools::RealtimePublisher<geometry_msgs::msg::PoseStamped>>(
+          posestamped_publisher_);
   realtime_fsm_goal_publisher_ =
-    std::make_shared<realtime_tools::RealtimePublisher<std_msgs::msg::String>>(fsm_goal_publisher_);
+      std::make_shared<realtime_tools::RealtimePublisher<std_msgs::msg::String>>(fsm_goal_publisher_);
 
   this->timer_ =
-    this->create_wall_timer(10ms, std::bind(&KeyboardControllerNode::PubCmdVelCallBack, this));
+      this->create_wall_timer(10ms, std::bind(&KeyboardControllerNode::PubCmdVelCallBack, this));
   std::shared_ptr<std::thread> read_key_thread =
-    std::make_shared<std::thread>(&KeyboardControllerNode::ReadKeyThread, this);
+      std::make_shared<std::thread>(&KeyboardControllerNode::ReadKeyThread, this);
   (*read_key_thread).detach();
   pose_.pose.position.z = MIN_HEIGHT;
-  for (size_t i = 0; i < 3; i++) {
+  for (size_t i = 0; i < 3; i++)
+  {
     rpy_[i] = 0.0;
   }
   fsm_goal_.data = "idle";
@@ -35,7 +36,7 @@ void KeyboardControllerNode::print_interface()
   std::cout << R"(
   -------------------------------------------------------
                     State Machines
-  0: passive 1: transform up 2 balance 3: transform down 4: rl
+  0: passive 1: transform up 2 rl 3: transform down
   -------------------------------------------------------
   Moving Around    Postion Control    Orientation Control                                       
         w                 ↑                u i o                                               
@@ -91,102 +92,107 @@ int KeyboardControllerNode::get_key()
 
 void KeyboardControllerNode::ReadKeyThread()
 {
-  while (rclcpp::ok()) {
-    switch (get_key()) {
-      case '0':
-        fsm_goal_.data = "idle";
-        break;
-      case '1':
-        fsm_goal_.data = "transform_up";
-        break;
-      case '2':
-        fsm_goal_.data = "rl";
-        break;
-      case '3':
-        fsm_goal_.data = "transform_down";
-        break;
-      case 'w':
-        twist_.linear.x += STEP_ACCL_X * speed_scale_;
-        break;
-      case 'x':
-        twist_.linear.x -= STEP_ACCL_X * speed_scale_;
-        break;
-      case 'a':
-        twist_.angular.z += STEP_ACCL_W * speed_scale_;
-        break;
-      case 'd':
-        twist_.angular.z -= STEP_ACCL_W * speed_scale_;
-        break;
-      case 's':
-        twist_.linear.x = 0.0;
-        twist_.angular.z = 0.0;
-        break;
-      case '+':
-        speed_scale_ += 0.1;
-        break;
-      case '-':
-        speed_scale_ -= 0.1;
-        break;
-      case '*':
-        pose_scale_ += 0.1;
-        break;
-      case '/':
-        pose_scale_ -= 0.1;
-        break;
-      case '\033':
-        if (get_key() == '[') {
-          switch (get_key()) {
-            case 'A':  // Up
-              pose_.pose.position.z += STEP_HEIGHT * pose_scale_;
-              break;
-            case 'B':  // Down
-              pose_.pose.position.z -= STEP_HEIGHT * pose_scale_;
-              break;
-            case 'C':  // Right
-              pose_.pose.position.y -= STEP_POSITION * pose_scale_;
-              break;
-            case 'D':  // Left
-              pose_.pose.position.y += STEP_POSITION * pose_scale_;
-              break;
-            default:
-              break;
-          }
+  while (rclcpp::ok())
+  {
+    switch (get_key())
+    {
+    case '0':
+      fsm_goal_.data = "idle";
+      break;
+    case '1':
+      fsm_goal_.data = "transform_up";
+      break;
+    case '2':
+      fsm_goal_.data = "rl";
+      break;
+    case '3':
+      fsm_goal_.data = "transform_down";
+      break;
+    case 'w':
+      twist_.linear.x += STEP_ACCL_X * speed_scale_;
+      break;
+    case 'x':
+      twist_.linear.x -= STEP_ACCL_X * speed_scale_;
+      break;
+    case 'a':
+      twist_.angular.z += STEP_ACCL_W * speed_scale_;
+      break;
+    case 'd':
+      twist_.angular.z -= STEP_ACCL_W * speed_scale_;
+      break;
+    case 's':
+      twist_.linear.x = 0.0;
+      twist_.angular.z = 0.0;
+      break;
+    case '+':
+      speed_scale_ += 0.1;
+      break;
+    case '-':
+      speed_scale_ -= 0.1;
+      break;
+    case '*':
+      pose_scale_ += 0.1;
+      break;
+    case '/':
+      pose_scale_ -= 0.1;
+      break;
+    case '\033':
+      if (get_key() == '[')
+      {
+        switch (get_key())
+        {
+        case 'A': // Up
+          pose_.pose.position.z += STEP_HEIGHT * pose_scale_;
+          break;
+        case 'B': // Down
+          pose_.pose.position.z -= STEP_HEIGHT * pose_scale_;
+          break;
+        case 'C': // Right
+          pose_.pose.position.y -= STEP_POSITION * pose_scale_;
+          break;
+        case 'D': // Left
+          pose_.pose.position.y += STEP_POSITION * pose_scale_;
+          break;
+        default:
+          break;
         }
-        break;
-      case 'i':
-        rpy_[1] += STEP_ORIENTATION * pose_scale_;
-        break;
-      case ',':
-        rpy_[1] -= STEP_ORIENTATION * pose_scale_;
-        break;
-      case 'j':
-        rpy_[0] -= STEP_ORIENTATION * pose_scale_;
-        break;
-      case 'l':
-        rpy_[0] += STEP_ORIENTATION * pose_scale_;
-        break;
-      case 'u':
-        rpy_[2] -= STEP_ORIENTATION * pose_scale_;
-        break;
-      case 'o':
-        rpy_[2] += STEP_ORIENTATION * pose_scale_;
-        break;
-      case 'k':
-        pose_.pose.position.y = 0;
-        rpy_[0] = rpy_[1] = rpy_[2] = 0;
-        break;
-      case '\x03':  // Ctrl+C
-        std::cout << "KEYBOARD WILL BE BACK..." << std::endl;
-        rclcpp::shutdown();
-        break;
-      default:
-        break;
+      }
+      break;
+    case 'i':
+      rpy_[1] += STEP_ORIENTATION * pose_scale_;
+      break;
+    case ',':
+      rpy_[1] -= STEP_ORIENTATION * pose_scale_;
+      break;
+    case 'j':
+      rpy_[0] -= STEP_ORIENTATION * pose_scale_;
+      break;
+    case 'l':
+      rpy_[0] += STEP_ORIENTATION * pose_scale_;
+      break;
+    case 'u':
+      rpy_[2] -= STEP_ORIENTATION * pose_scale_;
+      break;
+    case 'o':
+      rpy_[2] += STEP_ORIENTATION * pose_scale_;
+      break;
+    case 'k':
+      pose_.pose.position.y = 0;
+      rpy_[0] = rpy_[1] = rpy_[2] = 0;
+      break;
+    case '\x03': // Ctrl+C
+      std::cout << "KEYBOARD WILL BE BACK..." << std::endl;
+      rclcpp::shutdown();
+      break;
+    default:
+      break;
     }
     speed_scale_ = clamp(speed_scale_, 0.1, 4.0);
     pose_scale_ = clamp(pose_scale_, 0.1, 4.0);
     twist_.linear.x = clamp(twist_.linear.x, -MAX_VEL_X, MAX_VEL_X);
     twist_.angular.z = clamp(twist_.angular.z, -MAX_VEL_W, MAX_VEL_W);
-    for (size_t i = 0; i < 3; i++) {
+    for (size_t i = 0; i < 3; i++)
+    {
       rpy_[i] = clamp(rpy_[i], -MAX_ORIENTATION, MAX_ORIENTATION);
     }
     tf2::Quaternion q;
@@ -203,15 +209,18 @@ void KeyboardControllerNode::ReadKeyThread()
 
 void KeyboardControllerNode::PubCmdVelCallBack()
 {
-  if (realtime_cmd_vel_publisher_ && realtime_cmd_vel_publisher_->trylock()) {
+  if (realtime_cmd_vel_publisher_ && realtime_cmd_vel_publisher_->trylock())
+  {
     realtime_cmd_vel_publisher_->msg_ = twist_;
     realtime_cmd_vel_publisher_->unlockAndPublish();
   }
-  if (realtime_posestamped_publisher_ && realtime_posestamped_publisher_->trylock()) {
+  if (realtime_posestamped_publisher_ && realtime_posestamped_publisher_->trylock())
+  {
     realtime_posestamped_publisher_->msg_ = pose_;
     realtime_posestamped_publisher_->unlockAndPublish();
   }
-  if (realtime_fsm_goal_publisher_ && realtime_fsm_goal_publisher_->trylock()) {
+  if (realtime_fsm_goal_publisher_ && realtime_fsm_goal_publisher_->trylock())
+  {
     realtime_fsm_goal_publisher_->msg_ = fsm_goal_;
     realtime_fsm_goal_publisher_->unlockAndPublish();
   }

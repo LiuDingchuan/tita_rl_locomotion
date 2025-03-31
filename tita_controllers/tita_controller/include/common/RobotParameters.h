@@ -15,24 +15,24 @@
 
 struct RobotControlParameters
 {
-  RobotControlParameters(){
-    torque_limit = {80.0, 20.0, 40.0, 5.0, 80.0, 20.0, 40.0, 5.0};
-    joint_kp = {600.0, 80.0, 80.0, 5.0, 600.0, 80.0, 80.0, 5.0};
-    joint_kd = {8.0, 8.0, 8.0, 0.2, 8.0, 8.0, 8.0, 0.2};
-    wheel_joint_name = {"joint_left_leg_4", "joint_right_leg_4"};
-    
+  RobotControlParameters()
+  {
+    torque_limit = {70.0, 70.0, 20.0, 70.0, 70.0, 20.0};
+    joint_kp = {80.0, 80.0, 5.0, 80.0, 80.0, 5.0};
+    joint_kd = {8.0, 8.0, 0.2, 8.0, 8.0, 0.2};
+    wheel_joint_name = {"left_wheel_joint", "right_wheel_joint"};
   }
-  scalar_t wheel_radius{0.0925};
+  scalar_t wheel_radius{0.16};
   scalar_t sliding_friction_coefficient{0.5};
   scalar_t static_friction_coefficient{0.8};
   std::string base_name{"base_link"};
   std::vector<std::string> wheel_joint_name;
-  std::string robot_description{"/usr/share/robot_description/tita/urdf/robot.urdf"};
-  size_t dof_chassis{8}, dof_arm{6};
+  std::string robot_description{"/usr/share/robot_description/diablo_pluspro/urdf/robot.urdf"};
+  size_t dof_chassis{6}, dof_arm{6};
 
   // control param
-  scalar_t dt;           // actual control period
-  int update_rate{500};  // control loop update rate
+  scalar_t dt;          // actual control period
+  int update_rate{500}; // control loop update rate
   std::vector<scalar_t> torque_limit;
   std::vector<scalar_t> joint_kp, joint_kd;
   std::vector<scalar_t> wbc_joint_kp, wbc_joint_kd;
@@ -63,13 +63,13 @@ struct RobotControlParameters
   scalar_t position_height_min{0.2}, velocity_height_min{-0.2}, acceleration_height_min{-30.0};
 
   scalar_t position_xsplit_max{0.05}, velocity_xsplit_max{0.2}, acceleration_xsplit_max{30.0};
-  scalar_t two_wheel_distance{0.2835};
+  scalar_t two_wheel_distance{0.403};
   scalar_t position_ysplit_max{+0.02}, velocity_ysplit_max{+0.2},
-    acceleration_ysplit_max{+30.0};  // dif_y
+      acceleration_ysplit_max{+30.0}; // dif_y
   scalar_t position_ysplit_min{-0.02}, velocity_ysplit_min{-0.2}, acceleration_ysplit_min{-30.0};
 
   scalar_t position_ybias_max{+0.02}, velocity_ybias_max{+0.2},
-    acceleration_ybias_max{+30.0};  // sum_y
+      acceleration_ybias_max{+30.0}; // sum_y
 
   // compensation param
   scalar_t bias_sum_y_{0}, bias_sum_z_{0}, bias_dif_x_{0}, bias_dif_y_{0};
@@ -86,4 +86,4 @@ struct RobotControlParameters
   std::vector<scalar_t> arm_joint_kp_, arm_joint_kd_, arm_joint_weight_;
 };
 
-#endif  // PROJECT_ROBOTPARAMETERS_H
+#endif // PROJECT_ROBOTPARAMETERS_H

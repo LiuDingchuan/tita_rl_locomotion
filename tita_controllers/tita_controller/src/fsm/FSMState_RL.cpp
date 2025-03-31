@@ -13,11 +13,11 @@
 
 FSMState_RL::FSMState_RL(std::shared_ptr<ControlFSMData> data)
     : FSMState(data, FSMStateName::RL, "rl"),
-      input_0(new float[33]),
-      input_1(new float[330]),
-      output(new float[8]),
-      output_last(new float[8]),
-      input_1_temp(new float[297])
+      input_0(new float[n_prio]),
+      input_1(new float[n_prio * history_len]),
+      output(new float[DOF]),
+      output_last(new float[DOF]),
+      input_1_temp(new float[temp_history_len_all])
 {
   cuda_test_ = std::make_shared<CudaTest>("/home/hilabldc/tita_rl/logs/diablo_pluspro/exported/policies/model_gn.engine");
   std::cout << "cuda init :" << cuda_test_->get_cuda_init() << std::endl;
@@ -27,20 +27,45 @@ void FSMState_RL::enter()
 {
   _data->state_command->firstRun = true;
 
-  for (int i = 0; i < 2; i++)
+  int DOF_of_single_leg = DOF / 2;
+  if (DOF_of_single_leg == 4)
   {
-    wheel_init_pos_abs_[i] = _data->low_state->q[4 * i + 3];
-    desired_pos[4 * i + 3] = 0;
-    desired_pos[4 * i] = _data->low_state->q[4 * i];
-    desired_pos[4 * i + 1] = _data->low_state->q[4 * i + 1];
-    desired_pos[4 * i + 2] = _data->low_state->q[4 * i + 2];
+    for (int i = 0; i < 2; i++)
+    {
+      wheel_init_pos_abs_[i] = _data->low_state->q[4 * i + 3];
+      desired_pos[4 * i + 3] = 0;
+      desired_pos[4 * i] = _data->low_state->q[4 * i];
+      desired_pos[4 * i + 1] = _data->low_state->q[4 * i + 1];
+      desired_pos[4 * i + 2] = _data->low_state->q[4 * i + 2];
+    }
+    for (int i = 0; i < 4; i++)
+    {
+      obs_.dof_pos[i + 4] = _data->low_state->q[i];
+      obs_.dof_vel[i + 4] = _data->low_state->dq[i];
+      obs_.dof_pos[i] = _data->low_state->q[i + 4];
+      obs_.dof_vel[i] = _data->low_state->dq[i + 4];
+    }
   }
-  for (int i = 0; i < 4; i++)
+  else if (DOF_of_single_leg == 3)
   {
-    obs_.dof_pos[i + 4] = _data->low_state->q[i];
-    obs_.dof_vel[i + 4] = _data->low_state->dq[i];
-    obs_.dof_pos[i] = _data->low_state->q[i + 4];
-    obs_.dof_vel[i] = _data->low_state->dq[i + 4];
+    for (int i = 0; i < 2; i++)
+    {
+      wheel_init_pos_abs_[i] = _data->low_state->q[3 * i + 2];
+      desired_pos[3 * i + 2] = 0;
+      desired_pos[3 * i] = _data->low_state->q[3 * i];
+      desired_pos[3 * i + 1] = _data->low_state->q[3 * i + 1];
+    }
+    for (int i = 0; i < 3; i++)
+    {
+      obs_.dof_pos[i + 3] = _data->low_state->q[i];
+      obs_.dof_vel[i + 3] = _data->low_state->dq[i];
+      obs_.dof_pos[i] = _data->low_state->q[i + 3];
+      obs_.dof_vel[i] = _data->low_state->dq[i + 3];
+    }
+  }
+  else
+  {
+    std::cout << "dof not init!!!!ERROR!!!!! :" << std::endl;
   }
 
   params_.action_scale = 0.5;
@@ -54,25 +79,24 @@ void FSMState_RL::enter()
   params_.commands_scale[1] = params_.lin_vel_scale;
   params_.commands_scale[2] = params_.ang_vel_scale;
 
-  const float default_dof_pos_tmp[8] = {0, 0.8, -1.5, 0, 0, 0.8, -1.5, 0};
-  for (int i = 0; i < 8; i++)
+  for (int i = 0; i < DOF; i++)
   {
-    params_.default_dof_pos[i] = default_dof_pos_tmp[i];
+    params_.default_dof_pos[i] = default_dof_pos[i];
   }
 
   x_vel_cmd_ = 0.;
   pitch_cmd_ = 0.;
 
-  for (int i = 0; i < 297; i++)
+  for (int i = 0; i < temp_history_len_all; i++)
     input_1.get()[i] = 0;
-  for (int i = 0; i < 8; i++)
+  for (int i = 0; i < DOF; i++)
     output_last.get()[i] = 0;
 
   obs_.forward_vec[0] = 1.0;
   obs_.forward_vec[1] = 0.0;
   obs_.forward_vec[2] = 0.0;
 
-  for (int j = 0; j < 8; j++)
+  for (int j = 0; j < DOF; j++)
   {
     action[j] = obs_.dof_pos[j];
   }
@@ -85,18 +109,18 @@ void FSMState_RL::enter()
     // obs_buf = torch::cat({obs_buf.index({Slice(1,None),Slice()}),obs_tensor},0);
     _GetObs();
 
-    for (int i = 0; i < 297; i++)
-      input_1_temp.get()[i] = input_1.get()[i + 33];
+    for (int i = 0; i < temp_history_len_all; i++)
+      input_1_temp.get()[i] = input_1.get()[i + n_prio];
 
-    for (int i = 0; i < 297; i++)
+    for (int i = 0; i < temp_history_len_all; i++)
       input_1.get()[i] = input_1_temp.get()[i];
 
-    for (int i = 0; i < 33; i++)
-      input_1.get()[i + 297] = input_0.get()[i];
+    for (int i = 0; i < n_prio; i++)
+      input_1.get()[i + temp_history_len_all] = input_0.get()[i];
   }
   std::cout << "init finised predict" << std::endl;
 
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < history_len; i++)
   {
     _Forward();
   }
@@ -122,9 +146,9 @@ void FSMState_RL::run()
   _data->low_cmd->kp.setZero();
   _data->low_cmd->kd.setZero();
   _data->low_cmd->tau_cmd.setZero();
-  for (int i = 0; i < 8; i++)
+  for (int i = 0; i < DOF; i++)
   {
-    if (i % 4 == 3)
+    if (i % (DOF / 2) == (DOF / 2 - 1))
     {
       _data->low_cmd->tau_cmd[i] = 12 * desired_pos[i] + 1.5 * (0 - _data->low_state->dq[i]);
     }
@@ -222,13 +246,13 @@ void FSMState_RL::_GetObs()
   obs_tmp.push_back(angle);
 
   // pos
-  for (int i = 0; i < 8; ++i)
+  for (int i = 0; i < DOF; ++i)
   {
     float pos = (this->obs_.dof_pos[i] - this->params_.default_dof_pos[i]) * params_.dof_pos_scale;
     obs_tmp.push_back(pos);
   }
   // vel
-  for (int i = 0; i < 8; ++i)
+  for (int i = 0; i < DOF; ++i)
   {
     float vel = this->obs_.dof_vel[i] * params_.dof_vel_scale;
     obs_tmp.push_back(vel);
@@ -236,12 +260,12 @@ void FSMState_RL::_GetObs()
 
   // last action
   // float index[12] = {3,4,5,0,1,2,9,10,11,6,7,8};
-  for (int i = 0; i < 8; ++i)
+  for (int i = 0; i < DOF; ++i)
   {
     obs_tmp.push_back(output_last.get()[i]);
   }
 
-  for (int i = 0; i < 33; i++)
+  for (int i = 0; i < n_prio; i++)
   {
     input_0.get()[i] = obs_tmp[i];
   }
@@ -252,16 +276,16 @@ void FSMState_RL::_Forward()
   _GetObs();
   cuda_test_->do_inference(input_0.get(), input_1.get(), output.get());
 
-  for (int i = 0; i < 297; i++)
-    input_1_temp.get()[i] = input_1.get()[i + 33];
+  for (int i = 0; i < temp_history_len_all; i++)
+    input_1_temp.get()[i] = input_1.get()[i + n_prio];
 
-  for (int i = 0; i < 297; i++)
+  for (int i = 0; i < temp_history_len_all; i++)
     input_1.get()[i] = input_1_temp.get()[i];
 
-  for (int i = 0; i < 33; i++)
-    input_1.get()[i + 297] = input_0.get()[i];
+  for (int i = 0; i < n_prio; i++)
+    input_1.get()[i + temp_history_len_all] = input_0.get()[i];
 
-  for (int i = 0; i < 8; i++)
+  for (int i = 0; i < DOF; i++)
     output_last.get()[i] = output.get()[i];
 }
 
@@ -273,27 +297,27 @@ void FSMState_RL::_Run_Forward()
 
     if (!stop_update_)
     {
-      for (int i = 0; i < 4; i++)
+      for (int i = 0; i < DOF / 2; i++)
       {
-        obs_.dof_pos[i + 4] = _data->low_state->q[i];
-        obs_.dof_vel[i + 4] = _data->low_state->dq[i];
-        obs_.dof_pos[i] = _data->low_state->q[i + 4];
-        obs_.dof_vel[i] = _data->low_state->dq[i + 4];
+        obs_.dof_pos[i + DOF / 2] = _data->low_state->q[i];
+        obs_.dof_vel[i + DOF / 2] = _data->low_state->dq[i];
+        obs_.dof_pos[i] = _data->low_state->q[i + DOF / 2];
+        obs_.dof_vel[i] = _data->low_state->dq[i + DOF / 2];
       }
-      obs_.dof_pos[3] = 0;
-      obs_.dof_pos[7] = 0;
+      obs_.dof_pos[DOF / 2 - 1] = 0;
+      obs_.dof_pos[DOF - 1] = 0;
 
       _Forward();
 
-      for (int j = 0; j < 8; j++)
+      for (int j = 0; j < DOF; j++)
       {
         action[j] = output.get()[j] * params_.action_scale + params_.default_dof_pos[j];
       }
-
-      for (int i = 0; i < 4; i++)
+      // 换位？左腿换右腿吗？
+      for (int i = 0; i < DOF / 2; i++)
       {
-        desired_pos[i + 4] = action[i];
-        desired_pos[i] = action[i + 4];
+        desired_pos[i + (DOF / 2)] = action[i];
+        desired_pos[i] = action[i + (DOF / 2)];
         // std::cerr << "desired_pos" << i << ":" << desired_pos[i] << std::endl;
       }
     }

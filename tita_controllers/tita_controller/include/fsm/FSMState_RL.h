@@ -4,41 +4,43 @@
 #include <thread>
 #include "FSMState.h"
 #include "tensorrt_cuda/tensor_cuda_test.hpp"
+
+#define DOF 6
 /**
  *
  */
 
 struct ModelParams
 {
-    float damping;
-    float stiffness;
-    float action_scale;
-    float hip_scale_reduction;
-    float num_of_dofs;
-    float lin_vel_scale;
-    float ang_vel_scale;
-    float dof_pos_scale;
-    float dof_vel_scale;
-    float clip_obs;
-    float clip_actions;
-    float torque_limits[8];
-    float d_gains[8];
-    float p_gains[8];
-    float commands_scale[3];
-    float default_dof_pos[8];
+  float damping;
+  float stiffness;
+  float action_scale;
+  float hip_scale_reduction;
+  float num_of_dofs;
+  float lin_vel_scale;
+  float ang_vel_scale;
+  float dof_pos_scale;
+  float dof_vel_scale;
+  float clip_obs;
+  float clip_actions;
+  float torque_limits[DOF];
+  float d_gains[DOF];
+  float p_gains[DOF];
+  float commands_scale[3];
+  float default_dof_pos[DOF];
 };
 
 struct Observations
 {
-    float lin_vel[3];           
-    float ang_vel[3];  
-    float gravity_vec[3];
-    float forward_vec[3];       
-    float commands[3];        
-    float base_quat[4];   
-    float dof_pos[8];           
-    float dof_vel[8];           
-    float actions[8];
+  float lin_vel[3];
+  float ang_vel[3];
+  float gravity_vec[3];
+  float forward_vec[3];
+  float commands[3];
+  float base_quat[4];
+  float dof_pos[DOF];
+  float dof_vel[DOF];
+  float actions[DOF];
 };
 
 class FSMState_RL : public FSMState
@@ -69,6 +71,13 @@ private:
   float wheel_init_pos_abs_[4];
   float x_vel_cmd_;
   float pitch_cmd_;
+
+  // 从RL里面拿到的数据
+  int n_prio = 27;
+  int history_len = 10;
+  int n_priv_latent = 30;
+  int temp_history_len_all = 270 - 27;
+
 private:
   ModelParams params_;
   Observations obs_;
@@ -80,7 +89,10 @@ private:
 
   std::thread forward_thread;
   bool threadRunning;
-  float desired_pos[8] = {0, 0.75, -1.5, 0, 0, 0.75, -1.5, 0};
+  // float desired_pos[DOF] = {0.75, -1.5, 0, 0.75, -1.5, 0};
+  // float default_dof_pos[DOF] = {0.8, -1.5, 0, 0.8, -1.5, 0};
+  float desired_pos[DOF] = {-0.184481302, -1.194677873, 0.0, -0.184481302, -1.194677873, 0.0};
+  float default_dof_pos[DOF] = {-0.184481302, -1.194677873, 0.0, -0.184481302, -1.194677873, 0.0};
   // AttitudeData* attitude_ = nullptr;
   // LegData* legdata_ = nullptr;
   // LinearKFPositionVelocityEstimator<float>* posvelest_ = nullptr;
@@ -97,11 +109,10 @@ private:
   void _GetObs();
   Vec3<double> a_l;
 
-  float action[8];
+  float action[DOF];
 
   bool stop_update_ = false;
   bool thread_first_ = true;
-  
 };
 
-#endif  // FSMSTATE_RL_H
+#endif // FSMSTATE_RL_H
