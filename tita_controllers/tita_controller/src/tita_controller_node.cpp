@@ -158,6 +158,7 @@ namespace tita_locomotion
       init_estimator_count_++;
     // controlData_->pinocchio_model->updateState();
     controlData_->state_command->convertFSMState();
+    // 状态机转换在这里
     FSMController_->run();
     // Update torque
     for (uint id = 0; id < joints_.size(); id++)
