@@ -318,7 +318,7 @@ void FSMState_RL::_Run_Forward()
       {
         desired_pos[i + (DOF / 2)] = action[i];
         desired_pos[i] = action[i + (DOF / 2)];
-        std::cerr << "desired_pos" << i << ":" << desired_pos[i] << std::endl;
+        // std::cerr << "desired_pos" << i << ":" << desired_pos[i] << std::endl;
       }
     }
 

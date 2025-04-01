@@ -372,6 +372,7 @@ namespace tita_locomotion
     std::lock_guard<std::mutex> lock(fsm_goal_mutex_);
     auto cmd = controlData_->state_command->rc_data_;
     cmd->fsm_name_ = msg->data;
+    // printf("fsm_name_ is %s", cmd->fsm_name_.c_str());
   }
 
   void TitaController::joy_cb(const sensor_msgs::msg::Joy::SharedPtr msg)
