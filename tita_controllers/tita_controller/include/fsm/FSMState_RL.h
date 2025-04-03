@@ -89,8 +89,6 @@ private:
 
   std::thread forward_thread;
   bool threadRunning;
-  // float desired_pos[DOF] = {0.75, -1.5, 0, 0.75, -1.5, 0};
-  // float default_dof_pos[DOF] = {0.8, -1.5, 0, 0.8, -1.5, 0};
   // float desired_pos[DOF] = {-0.184481302, -1.194677873, 0.0, -0.184481302, -1.194677873, 0.0};
   // float default_dof_pos[DOF] = {-0.184481302, -1.194677873, 0.0, -0.184481302, -1.194677873, 0.0};
   float desired_pos[DOF] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};

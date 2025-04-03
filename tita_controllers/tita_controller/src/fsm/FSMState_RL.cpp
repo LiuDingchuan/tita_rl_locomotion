@@ -154,7 +154,7 @@ void FSMState_RL::run()
     }
     else // 关节？
     {
-      _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 3.0 * (0 - _data->low_state->dq[i]);
+      _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 1.0 * (0 - _data->low_state->dq[i]);
     }
   }
 }
@@ -211,9 +211,9 @@ void FSMState_RL::_GetObs()
   // _gyFilter->addValue(angvel(1,0));
   // _gzFilter->addValue(angvel(2,0));
   //
-  obs_tmp.push_back(angvel(0) * 0.25);
-  obs_tmp.push_back(angvel(1) * 0.25);
-  obs_tmp.push_back(angvel(2) * 0.25);
+  obs_tmp.push_back(angvel(0) * params_.ang_vel_scale);
+  obs_tmp.push_back(angvel(1) * params_.ang_vel_scale);
+  obs_tmp.push_back(angvel(2) * params_.ang_vel_scale);
 
   for (int i = 0; i < 3; ++i)
   {
@@ -228,7 +228,7 @@ void FSMState_RL::_GetObs()
   float min = -1.0;
 
   float rot = rx * 3.14;
-  float vel = ly * 2;
+  float vel = ly * params_.lin_vel_scale;
 
   double heading = 0.;
   double angle = (double)rot - heading;
@@ -237,9 +237,10 @@ void FSMState_RL::_GetObs()
   {
     angle = angle - 2.0 * M_PI;
   }
-  angle = angle * 0.5;
+  ////没懂这里为什么要乘以0.5又乘以0.25,先注释掉试试
+  // angle = angle * 0.5;
   angle = std::max(std::min((float)angle, max), min);
-  angle = angle * 0.25;
+  // angle = angle * 0.25;
 
   obs_tmp.push_back(vel);
   obs_tmp.push_back(0.0);
@@ -320,10 +321,10 @@ void FSMState_RL::_Run_Forward()
         desired_pos[i] = action[i + (DOF / 2)];
         // std::cerr << "desired_pos" << i << ":" << desired_pos[i] << std::endl;
       }
-      std::cerr << "desired_pos0: " << desired_pos[0]
-                << " desired_pos1: " << desired_pos[1]
-                << " desired_pos2 " << desired_pos[2]
-                << " desired_pos3: " << desired_pos[3]
+      std::cerr << "des_pos0: " << desired_pos[0]
+                << " des_pos1: " << desired_pos[1]
+                << " des_pos2 " << desired_pos[2]
+                << " des_pos3: " << desired_pos[3]
                 << " des_pos4: " << desired_pos[4]
                 << " des_pos5: " << desired_pos[5] << std::endl;
     }
