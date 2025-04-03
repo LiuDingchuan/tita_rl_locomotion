@@ -294,8 +294,8 @@ void FSMState_RL::_Run_Forward()
       {
         desired_pos[i + 4] = action[i];
         desired_pos[i] = action[i + 4];
-        // std::cerr << "desired_pos" << i << ":" << desired_pos[i] << std::endl;
       }
+      std::cerr << "des_pos1 " << desired_pos[1] << " des_pos2 " << desired_pos[2] << " des_pos5 " << desired_pos[5] << " des_pos6 " << desired_pos[6] << std::endl;
     }
 
     absoluteWait(_start_time, (long long)(0.01 * 1000000));
