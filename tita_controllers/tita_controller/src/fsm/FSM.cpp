@@ -32,12 +32,14 @@ void FSM::run()
   {
     _currentState = _stateList.passive;
     _currentState->run();
+    std::cout << "notsafe" << std::endl;
     return;
   }
 
   if (_mode == FSMMode::NORMAL)
   {
     _currentState->run();
+    // std::cout << "[NORMAL] mode: " << _currentState->_stateNameStr.c_str() << std::endl;
     _nextStateName = _currentState->checkTransition();
     if (_nextStateName != _currentState->_stateName)
     {
@@ -52,7 +54,7 @@ void FSM::run()
     _currentState->enter();
     _mode = FSMMode::NORMAL;
     _currentState->run();
-    std::cout << "mode: " << _currentState->_stateNameStr.c_str() << std::endl;
+    std::cout << "[CHANGE] mode: " << _currentState->_stateNameStr.c_str() << std::endl;
   }
   // limit torque out put
   for (Eigen::Index i = 0; i < _data->low_cmd->tau_cmd.size(); i++)
@@ -97,8 +99,8 @@ FSMState *FSM::getNextState(FSMStateName stateName)
 bool FSM::checkSafty()
 {
   bool isSafe = true;
-  if (_data->state_estimator->getResult().rBody(2, 2) < 0.5)
-    isSafe = false;
+  // if (_data->state_estimator->getResult().rBody(2, 2) < 0.5) //pitch<0.5
+  //   isSafe = false;
   if (_currentState->_stateName == FSMStateName::BALANCE_STAND)
   {
     if (std::abs(_data->wheel_legged_data->com_position_relative(point::X)) > 0.15)

@@ -481,45 +481,45 @@ tita_controller:
 
   torque_limit: {
     type: double_array,
-    default_value: [80.0, 20.0, 40.0, 5.0, 80.0, 20.0, 40.0, 5.0],
+    default_value: [70.0, 70.0, 15.0, 70.0, 70.0, 15.0],
     description: "Max torque of every joint motor.",
     validation: {
-      fixed_size<>: [8],
+      fixed_size<>: [6],
     }
   }
   joint_pd:
     p: {
       type: double_array,
-      default_value: [600.0, 80.0, 80.0, 5.0, 600.0, 80.0, 80.0, 5.0],
+      default_value: [80.0, 80.0, 5.0, 80.0, 80.0, 5.0],
       description: "Max torque of every joint motor.",
       validation: {
-        fixed_size<>: [8],
+        fixed_size<>: [6],
       }
     }
     d: {
       type: double_array,
-      default_value: [8.0, 8.0, 8.0, 0.2, 8.0, 8.0, 8.0, 0.2],
+      default_value: [8.0, 8.0, 0.2, 8.0, 8.0, 0.2],
       description: "Max torque of every joint motor.",
       validation: {
-        fixed_size<>: [8],
+        fixed_size<>: [6],
       }
     }
   # for wbc
   wbc_joint_pd:
     p: {
       type: double_array,
-      default_value: [100.0, 00.0, 100.0, 0.0, 100.0, 00.0, 100.0, 0.0],
+      default_value: [80.0, 80.0, 5.0, 80.0, 80.0, 5.0],
       description: "Max torque of every joint motor.",
       validation: {
-        fixed_size<>: [8],
+        fixed_size<>: [6],
       }
     }
     d: {
       type: double_array,
-      default_value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+      default_value: [8.0, 8.0, 0.2, 8.0, 8.0, 0.2],
       description: "Max torque of every joint motor.",
       validation: {
-        fixed_size<>: [8],
+        fixed_size<>: [6],
       }
     }
     # for test

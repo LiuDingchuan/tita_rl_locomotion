@@ -48,94 +48,94 @@
 #include "tita_utils/topic_names.hpp"
 namespace tita_locomotion
 {
-using LoanedCommandInterface =
-  std::optional<std::reference_wrapper<hardware_interface::LoanedCommandInterface>>;
-using LoanedStateInterface =
-  std::optional<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
-struct Joint
-{
-  Joint() {}
-  LoanedCommandInterface position_command_handle;
-  LoanedCommandInterface velocity_command_handle;
-  LoanedCommandInterface effort_command_handle;
-  LoanedCommandInterface kp_command_handle;
-  LoanedCommandInterface kd_command_handle;
+  using LoanedCommandInterface =
+      std::optional<std::reference_wrapper<hardware_interface::LoanedCommandInterface>>;
+  using LoanedStateInterface =
+      std::optional<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
+  struct Joint
+  {
+    Joint() {}
+    LoanedCommandInterface position_command_handle;
+    LoanedCommandInterface velocity_command_handle;
+    LoanedCommandInterface effort_command_handle;
+    LoanedCommandInterface kp_command_handle;
+    LoanedCommandInterface kd_command_handle;
 
-  LoanedStateInterface position_handle;
-  LoanedStateInterface velocity_handle;
-  LoanedStateInterface effort_handle;
-  std::string name;
-};
+    LoanedStateInterface position_handle;
+    LoanedStateInterface velocity_handle;
+    LoanedStateInterface effort_handle;
+    std::string name;
+  };
 
-class TitaController : public controller_interface::ControllerInterface
-{
-public:
-  ~TitaController();
-  TitaController();
-  controller_interface::InterfaceConfiguration command_interface_configuration() const override;
-  controller_interface::InterfaceConfiguration state_interface_configuration() const override;
-  controller_interface::CallbackReturn on_init() override;
-  controller_interface::return_type update(
-    const rclcpp::Time & time, const rclcpp::Duration & period) override;
-  controller_interface::CallbackReturn on_configure(
-    const rclcpp_lifecycle::State & previous_state) override;
-  controller_interface::CallbackReturn on_activate(
-    const rclcpp_lifecycle::State & previous_state) override;
-  controller_interface::CallbackReturn on_deactivate(
-    const rclcpp_lifecycle::State & previous_state) override;
-  controller_interface::CallbackReturn on_cleanup(
-    const rclcpp_lifecycle::State & previous_state) override;
-  controller_interface::CallbackReturn on_error(
-    const rclcpp_lifecycle::State & previous_state) override;
-  controller_interface::CallbackReturn on_shutdown(
-    const rclcpp_lifecycle::State & previous_state) override;
+  class TitaController : public controller_interface::ControllerInterface
+  {
+  public:
+    ~TitaController();
+    TitaController();
+    controller_interface::InterfaceConfiguration command_interface_configuration() const override;
+    controller_interface::InterfaceConfiguration state_interface_configuration() const override;
+    controller_interface::CallbackReturn on_init() override;
+    controller_interface::return_type update(
+        const rclcpp::Time &time, const rclcpp::Duration &period) override;
+    controller_interface::CallbackReturn on_configure(
+        const rclcpp_lifecycle::State &previous_state) override;
+    controller_interface::CallbackReturn on_activate(
+        const rclcpp_lifecycle::State &previous_state) override;
+    controller_interface::CallbackReturn on_deactivate(
+        const rclcpp_lifecycle::State &previous_state) override;
+    controller_interface::CallbackReturn on_cleanup(
+        const rclcpp_lifecycle::State &previous_state) override;
+    controller_interface::CallbackReturn on_error(
+        const rclcpp_lifecycle::State &previous_state) override;
+    controller_interface::CallbackReturn on_shutdown(
+        const rclcpp_lifecycle::State &previous_state) override;
 
-protected:
-  void cmd_vel_cb(const geometry_msgs::msg::Twist::SharedPtr msg);
-  void posestamped_cb(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
-  void fsm_goal_cb(const std_msgs::msg::String::SharedPtr msg);
-  void joy_cb(const sensor_msgs::msg::Joy::SharedPtr msg);
+  protected:
+    void cmd_vel_cb(const geometry_msgs::msg::Twist::SharedPtr msg);
+    void posestamped_cb(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
+    void fsm_goal_cb(const std_msgs::msg::String::SharedPtr msg);
+    void joy_cb(const sensor_msgs::msg::Joy::SharedPtr msg);
 
-  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_subscription_;
-  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr posestamped_subscription_;
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr fsm_goal_subscription_;
-  rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joy_subscription_;
-  sensor_msgs::msg::Joy::SharedPtr joy_msg_ = nullptr;
+    rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_subscription_;
+    rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr posestamped_subscription_;
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr fsm_goal_subscription_;
+    rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joy_subscription_;
+    sensor_msgs::msg::Joy::SharedPtr joy_msg_ = nullptr;
 
-protected:
-  void plan_commands_cb();
-  void robot_states_cb();
-  void rigid_body_cb(const locomotion_msgs::msg::RigidBody::SharedPtr msg);
-  rclcpp::Publisher<locomotion_msgs::msg::PlanCommands>::SharedPtr plan_commands_publisher_;
-  rclcpp::Publisher<locomotion_msgs::msg::RobotStates>::SharedPtr robot_states_publisher_;
-  rclcpp::Subscription<locomotion_msgs::msg::RigidBody>::SharedPtr rigid_body_subscription_;
+  protected:
+    void plan_commands_cb();
+    void robot_states_cb();
+    void rigid_body_cb(const locomotion_msgs::msg::RigidBody::SharedPtr msg);
+    rclcpp::Publisher<locomotion_msgs::msg::PlanCommands>::SharedPtr plan_commands_publisher_;
+    rclcpp::Publisher<locomotion_msgs::msg::RobotStates>::SharedPtr robot_states_publisher_;
+    rclcpp::Subscription<locomotion_msgs::msg::RigidBody>::SharedPtr rigid_body_subscription_;
 
-protected:
-  std::vector<std::shared_ptr<Joint>> joints_;
-  std::vector<std::string> joint_names_;
-  std::vector<std::string> sensor_names_;
-  std::vector<std::string> command_interface_types_;
-  std::vector<std::string> state_interface_types_;
-  std::unique_ptr<semantic_components::IMUSensor> imu_sensor_;
-  std::shared_ptr<tita_controller::ParamListener> param_listener_;
-  tita_controller::Params params_;
+  protected:
+    std::vector<std::shared_ptr<Joint>> joints_;
+    std::vector<std::string> joint_names_;
+    std::vector<std::string> sensor_names_;
+    std::vector<std::string> command_interface_types_;
+    std::vector<std::string> state_interface_types_;
+    std::unique_ptr<semantic_components::IMUSensor> imu_sensor_;
+    std::shared_ptr<tita_controller::ParamListener> param_listener_;
+    tita_controller::Params params_;
 
-protected:  // TODO:
-  void setup_controller();
-  void setup_control_parameters();
-  void update_control_parameters();
+  protected: // TODO:
+    void setup_controller();
+    void setup_control_parameters();
+    void update_control_parameters();
 
-  int init_estimator_count_{0};
-  std::shared_ptr<FSM> FSMController_;
-  std::shared_ptr<ControlFSMData> controlData_;
-  void lqr_loop_thread();
-  std::thread /*main_thread_, */ lqr_thread_;
-  std::atomic<bool> /*main_thread_running_{false}, */ lqr_thread_running_{false};
-  std::mutex mutex_;
-  std::mutex cmd_vel_mutex_, pose_stamped_mutex_, fsm_goal_mutex_, joy_mutex_, rigid_body_mutex_;
-  benchmark::RepeatedTimer mpcTimer_;
-  benchmark::RepeatedTimer wbcTimer_;
-};
+    int init_estimator_count_{0};
+    std::shared_ptr<FSM> FSMController_;
+    std::shared_ptr<ControlFSMData> controlData_;
+    void lqr_loop_thread();
+    std::thread /*main_thread_, */ lqr_thread_;
+    std::atomic<bool> /*main_thread_running_{false}, */ lqr_thread_running_{false};
+    std::mutex mutex_;
+    std::mutex cmd_vel_mutex_, pose_stamped_mutex_, fsm_goal_mutex_, joy_mutex_, rigid_body_mutex_;
+    benchmark::RepeatedTimer mpcTimer_;
+    benchmark::RepeatedTimer wbcTimer_;
+  };
 
-}  // namespace tita_locomotion
-#endif  // TITA_CONTROLLER__TITA_CONTROLLER_NODE_HPP_
+} // namespace tita_locomotion
+#endif // TITA_CONTROLLER__TITA_CONTROLLER_NODE_HPP_

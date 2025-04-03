@@ -69,7 +69,7 @@ void FSMState_RL::enter()
   }
 
   params_.action_scale = 0.5;
-  params_.num_of_dofs = 8;
+  params_.num_of_dofs = DOF;
   params_.lin_vel_scale = 2.0;
   params_.ang_vel_scale = 0.25;
   params_.dof_pos_scale = 1.0;
@@ -128,7 +128,7 @@ void FSMState_RL::enter()
   threadRunning = true;
   if (thread_first_)
   {
-    forward_thread = std::thread(&FSMState_RL::_Run_Forward, this);
+    forward_thread = std::thread(&FSMState_RL::_Run_Forward, this); // 应该是这个线程一直在跑然后获得desired_pos
     thread_first_ = false;
   }
   stop_update_ = false;
@@ -320,6 +320,7 @@ void FSMState_RL::_Run_Forward()
         desired_pos[i] = action[i + (DOF / 2)];
         // std::cerr << "desired_pos" << i << ":" << desired_pos[i] << std::endl;
       }
+      std::cerr << "desired_pos0: " << desired_pos[0] << " desired_pos1: " << desired_pos[1] << " desired_pos3: " << desired_pos[3] << " des_pos4: " << desired_pos[4] << std::endl;
     }
 
     absoluteWait(_start_time, (long long)(0.01 * 1000000));

@@ -14,7 +14,7 @@
  * @param _controlFSMData holds all of the relevant control data
  */
 FSMState_RecoveryStand::FSMState_RecoveryStand(std::shared_ptr<ControlFSMData> data)
-: FSMState(data, FSMStateName::RECOVERY_STAND, "recovery_stand")
+    : FSMState(data, FSMStateName::RECOVERY_STAND, "recovery_stand")
 {
   // Do nothing
   // Set the pre controls safety checks
@@ -30,7 +30,8 @@ FSMState_RecoveryStand::FSMState_RecoveryStand(std::shared_ptr<ControlFSMData> d
   rolling_jpos.setZero(dof);
   initial_jpos.setZero(dof);
   f_ff.setZero(dof);
-  if (dof == 8) {
+  if (dof == 8)
+  {
     // goal configuration
     // Folding
     fold_jpos << 0.75f, 1.20f, -2.7f, 0.0f, -0.75f, 1.2f, -2.7f, 0.0f;
@@ -39,20 +40,24 @@ FSMState_RecoveryStand::FSMState_RecoveryStand(std::shared_ptr<ControlFSMData> d
     // Rolling
     rolling_jpos << -0.32f, -1.5f, -2.7f, 0.0f, -0.32f, -1.5f, -2.7f, 0.0f;
     f_ff << -20.f, 0.f, -25.f, 0.0f, 20.f, 0.f, -25.f, 0.0f;
-  } else {
+  }
+  else
+  {
     // goal configuration
     // Folding
-    fold_jpos << 1.2f, -2.6f, 0.0f, 1.2f, -2.6f, 0.0f;
+    fold_jpos << -0.19, -1.19, 0.0, -0.19, -1.19, 0.0;
     // Stand Up
-    stand_jpos << 1.2f, -2.4f, 0.0f, 1.2f, -2.4f, 0.0f;
+    stand_jpos << -0.184481302, -1.194677873, 0.0, -0.184481302, -1.194677873, 0.0;
     // Rolling
-    rolling_jpos << 1.5f, -1.6f, 2.77f, 1.3f, -3.1f, 2.77f;
+    rolling_jpos << 0.0f, -0.0f, 0.0f, 0.0f, 0.0f, 0.0f;
     f_ff << 0.f, -25.f, 0.f, 0.f, -25.f, 0.f;
   }
 }
 
 void FSMState_RecoveryStand::enter()
 {
+  size_t dof = _data->params->dof_chassis;
+  std::cout << "[Recovery Stand] enter" << std::endl;
   // Default is to not transition
   this->_nextStateName = this->_stateName;
   fold_ramp_iter = timer_fold * _data->params->update_rate;
@@ -69,37 +74,49 @@ void FSMState_RecoveryStand::enter()
   // initial configuration, position
   initial_jpos = this->_data->low_state->q;
   // initial_jpos(3) = initial_jpos(7) = 0;
-  fold_jpos(3) = initial_jpos(3);
-  fold_jpos(7) = initial_jpos(7);
-
-  fold_ramp_iter = fold_ramp_iter * (initial_jpos - fold_jpos).cwiseAbs().maxCoeff();  //
+  if (dof == 8)
+  {
+    fold_jpos(3) = initial_jpos(3);
+    fold_jpos(7) = initial_jpos(7);
+  }
+  else if (dof == 6)
+  {
+    std::cout << "dof == 6, using diablo_plus_pro" << std::endl;
+    fold_jpos(2) = initial_jpos(2);
+    fold_jpos(5) = initial_jpos(5);
+  }
+  fold_ramp_iter = fold_ramp_iter * (initial_jpos - fold_jpos).cwiseAbs().maxCoeff(); //
   // PRINT_MAT(initial_jpos - fold_jpos);
   // printf("fold_ramp_iter:%d\n", fold_ramp_iter);
   // printf("maxCoeff      :%f\n", (initial_jpos - fold_jpos).cwiseAbs().maxCoeff());
 
   // scalar_t body_height = this->_data->_stateEstimator->getResult().position[2];
 
-  _flag = FoldLegs;
-  if (!_UpsideDown()) {
-    // Proper orientation
-    // if (  (0.2 < body_height) && (body_height < 0.45) ){
-    //   printf("[Recovery Balance] body height is %f; Stand Up \n", body_height);
-    //   _flag = StandUp;
-    // }else{
-    //   printf("[Recovery Balance] body height is %f; Folding legs \n", body_height);
-    // }
-  } else {
-    printf("[Recovery Balance] UpsideDown (%d) \n", _UpsideDown());
-    _flag = RollOver;
-  }
+  _flag = HeadUp;
+  // if (!_UpsideDown())
+  // {
+  //   // Proper orientation
+  //   // if (  (0.2 < body_height) && (body_height < 0.45) ){
+  //   //   printf("[Recovery Balance] body height is %f; Stand Up \n", body_height);
+  //   //   _flag = StandUp;
+  //   // }else{
+  //   //   printf("[Recovery Balance] body height is %f; Folding legs \n", body_height);
+  //   // }
+  // }
+  // else
+  // {
+  //   printf("[Recovery Balance] UpsideDown (%d) \n", _UpsideDown());
+  //   _flag = RollOver;
+  // }
   _motion_start_iter = 0;
 }
 
 bool FSMState_RecoveryStand::_UpsideDown()
 {
-  //pretty_print(this->_data->_stateEstimator->getResult().rBody, std::cout, "Rot");
-  //if(this->_data->_stateEstimator->getResult().aBody[2] < 0){
-  if (this->_data->state_estimator->getResult().rBody(2, 2) < 0) {
+  // pretty_print(this->_data->_stateEstimator->getResult().rBody, std::cout, "Rot");
+  // if(this->_data->_stateEstimator->getResult().aBody[2] < 0){
+  if (this->_data->state_estimator->getResult().rBody(2, 2) < 0)
+  {
     return true;
   }
   return false;
@@ -111,32 +128,46 @@ bool FSMState_RecoveryStand::_UpsideDown()
 
 void FSMState_RecoveryStand::run()
 {
-  // printf("flag: %d, _state_iter: %d, _motion_start_iter: %d\n", _flag, _state_iter, _motion_start_iter);
+  // std::cout << "flag: " << _flag << ", _state_iter: " << _state_iter
+  //           << ", _motion_start_iter: " << _motion_start_iter << std::endl;
   _data->low_cmd->zero();
-  switch (_flag) {
-    case StandUp:
-      _StandUp(_state_iter - _motion_start_iter);
-      // std::cout << "Stand Up" << std::endl;
-      break;
-    case FoldLegs:
-      _FoldLegs(_state_iter - _motion_start_iter);
-      // std::cout << "Fold Legs" << std::endl;
-      break;
-    case RollOver:
-      _RollOver(_state_iter - _motion_start_iter);
-      // std::cout << "Roll Over" << std::endl;
-      break;
-    default:
-      std::cout << "ERROR: Recovery Stand State not defined" << std::endl;
-      break;
+  switch (_flag)
+  {
+  case StandUp:
+    _StandUp(_state_iter - _motion_start_iter);
+    // std::cout << "Stand Up" << std::endl;
+    break;
+  case FoldLegs:
+    _FoldLegs(_state_iter - _motion_start_iter);
+    // std::cout << "Fold Legs" << std::endl;
+    break;
+  case RollOver:
+    _RollOver(_state_iter - _motion_start_iter);
+    // std::cout << "Roll Over" << std::endl;
+    break;
+  case HeadUp:
+    // std::cout << "Head Up" << std::endl;
+    _HeadUp(_state_iter - _motion_start_iter);
+    break;
+  default:
+    std::cout << "ERROR: Recovery Stand State not defined" << std::endl;
+    break;
   }
   ++_state_iter;
 }
-
+/**
+ * @description: 通过线性插值计算关节位置
+ * @param {const size_t} &curr_iter
+ * @param {size_t} max_iter
+ * @param {const DVec<scalar_t>} &ini 起点
+ * @param {const DVec<scalar_t>} &fin 终点
+ * @return {*}
+ */
 DVec<scalar_t> FSMState_RecoveryStand::_SetJPosInterPts(
-  const size_t & curr_iter, size_t max_iter, const DVec<scalar_t> & ini, const DVec<scalar_t> & fin)
+    const size_t &curr_iter, size_t max_iter, const DVec<scalar_t> &ini, const DVec<scalar_t> &fin)
 {
-  if (ini.size() != fin.size()) {
+  if (ini.size() != fin.size())
+  {
     std::cerr << "[FSMState_RecoveryStand] ERROR: ini and fin must have the same size" << std::endl;
   }
 
@@ -144,7 +175,8 @@ DVec<scalar_t> FSMState_RecoveryStand::_SetJPosInterPts(
   float b(1.f);
 
   // if we're done interpolating
-  if (curr_iter <= max_iter) {
+  if (curr_iter <= max_iter)
+  {
     b = (float)curr_iter / (float)max_iter;
     a = 1.f - b;
   }
@@ -154,7 +186,7 @@ DVec<scalar_t> FSMState_RecoveryStand::_SetJPosInterPts(
   return inter_pos;
 }
 
-void FSMState_RecoveryStand::_RollOver(const int & curr_iter)
+void FSMState_RecoveryStand::_RollOver(const int &curr_iter)
 {
   // _SetJPosInterPts(curr_iter, rollover_ramp_iter, initial_jpos, rolling_jpos);
 
@@ -166,8 +198,8 @@ void FSMState_RecoveryStand::_RollOver(const int & curr_iter)
 
   DVec<scalar_t> inter_jpos;
   Eigen::Map<DVec<scalar_t>> kp_joint(
-    _data->params->joint_kp.data(), _data->params->joint_kp.size()),
-    kd_joint(_data->params->joint_kd.data(), _data->params->joint_kd.size());
+      _data->params->joint_kp.data(), _data->params->joint_kp.size()),
+      kd_joint(_data->params->joint_kd.data(), _data->params->joint_kd.size());
 
   inter_jpos = _SetJPosInterPts(curr_iter, rollover_ramp_iter, initial_jpos, rolling_jpos);
   _data->low_cmd->qd = inter_jpos;
@@ -177,19 +209,20 @@ void FSMState_RecoveryStand::_RollOver(const int & curr_iter)
   _data->low_cmd->tau_cmd = kp_joint.cwiseProduct(inter_jpos - _data->low_state->q) +
                             kd_joint.cwiseProduct(-_data->low_state->dq);
   _data->low_cmd->tau_cmd(3) = _data->low_cmd->tau_cmd(7) = 0.0;
-  for (Eigen::Index i(0); i < initial_jpos.size(); ++i) {
+  for (Eigen::Index i(0); i < initial_jpos.size(); ++i)
+  {
     bound(_data->low_cmd->tau_cmd(i), _data->params->torque_limit[i]);
   }
 }
 
-void FSMState_RecoveryStand::_StandUp(const int & curr_iter)
+void FSMState_RecoveryStand::_StandUp(const int &curr_iter)
 {
   Eigen::Map<DVec<scalar_t>> kp_joint(
-    _data->params->joint_kp.data(), _data->params->joint_kp.size()),
-    kd_joint(_data->params->joint_kd.data(), _data->params->joint_kd.size());
+      _data->params->joint_kp.data(), _data->params->joint_kp.size()),
+      kd_joint(_data->params->joint_kd.data(), _data->params->joint_kd.size());
 
   DVec<scalar_t> inter_jpos =
-    _SetJPosInterPts(curr_iter, standup_ramp_iter, initial_jpos, stand_jpos);
+      _SetJPosInterPts(curr_iter, standup_ramp_iter, initial_jpos, stand_jpos);
   _data->low_cmd->qd = inter_jpos;
   _data->low_cmd->qd_dot.setZero();
   _data->low_cmd->kp.setZero();
@@ -198,16 +231,21 @@ void FSMState_RecoveryStand::_StandUp(const int & curr_iter)
                             kd_joint.cwiseProduct(-_data->low_state->dq);
   _data->low_cmd->tau_cmd(3) = _data->low_cmd->tau_cmd(7) = 0;
 
-  for (Eigen::Index i(0); i < initial_jpos.size(); ++i) {
+  for (Eigen::Index i(0); i < initial_jpos.size(); ++i)
+  {
     bound(_data->low_cmd->tau_cmd(i), _data->params->torque_limit[i]);
   }
 }
-
-void FSMState_RecoveryStand::_FoldLegs(const int & curr_iter)
+/**
+ * @description: tita专属函数、收腿到中心位置
+ * @param {int} &curr_iter
+ * @return {*}
+ */
+void FSMState_RecoveryStand::_FoldLegs(const int &curr_iter)
 {
   Eigen::Map<DVec<scalar_t>> kp_joint(
-    _data->params->joint_kp.data(), _data->params->joint_kp.size()),
-    kd_joint(_data->params->joint_kd.data(), _data->params->joint_kd.size());
+      _data->params->joint_kp.data(), _data->params->joint_kp.size()),
+      kd_joint(_data->params->joint_kd.data(), _data->params->joint_kd.size());
 
   DVec<scalar_t> inter_jpos = _SetJPosInterPts(curr_iter, fold_ramp_iter, initial_jpos, fold_jpos);
   _data->low_cmd->qd = inter_jpos;
@@ -218,19 +256,44 @@ void FSMState_RecoveryStand::_FoldLegs(const int & curr_iter)
                             kd_joint.cwiseProduct(-_data->low_state->dq);
   _data->low_cmd->tau_cmd(3) = _data->low_cmd->tau_cmd(7) = 0;
 
-  for (Eigen::Index i(0); i < initial_jpos.size(); ++i) {
+  for (Eigen::Index i(0); i < initial_jpos.size(); ++i)
+  {
     bound(_data->low_cmd->tau_cmd(i), _data->params->torque_limit[i]);
   }
 
-  if (curr_iter >= fold_ramp_iter) {
-    if (_UpsideDown()) {
+  if (curr_iter >= fold_ramp_iter)
+  {
+    if (_UpsideDown())
+    {
       _flag = RollOver;
       initial_jpos = fold_jpos;
-    } else {
+    }
+    else
+    {
       _flag = StandUp;
       initial_jpos = fold_jpos;
     }
     _motion_start_iter = _state_iter + 1;
+  }
+}
+
+void FSMState_RecoveryStand::_HeadUp(const int &curr_iter)
+{
+  Eigen::Map<DVec<scalar_t>> kp_joint(
+      _data->params->joint_kp.data(), _data->params->joint_kp.size()),
+      kd_joint(_data->params->joint_kd.data(), _data->params->joint_kd.size());
+
+  DVec<scalar_t> inter_jpos = _SetJPosInterPts(curr_iter, fold_ramp_iter, initial_jpos, fold_jpos);
+  _data->low_cmd->qd = inter_jpos;
+  _data->low_cmd->qd_dot.setZero();
+  _data->low_cmd->kp.setZero();
+  _data->low_cmd->kd.setZero();
+  _data->low_cmd->tau_cmd = kp_joint.cwiseProduct(inter_jpos - _data->low_state->q) +
+                            kd_joint.cwiseProduct(-_data->low_state->dq);
+  _data->low_cmd->tau_cmd(2) = _data->low_cmd->tau_cmd(5) = 0;
+  for (Eigen::Index i(0); i < initial_jpos.size(); ++i)
+  {
+    bound(_data->low_cmd->tau_cmd(i), _data->params->torque_limit[i]);
   }
 }
 
@@ -247,29 +310,30 @@ FSMStateName FSMState_RecoveryStand::checkTransition()
   iter++;
 
   // Switch FSM control mode
-  switch (_data->state_command->desire_data_->fsm_state_name) {
-    case FSMStateName::RECOVERY_STAND:
-      break;
+  switch (_data->state_command->desire_data_->fsm_state_name)
+  {
+  case FSMStateName::RECOVERY_STAND:
+    break;
 
-    case FSMStateName::PASSIVE:  // normal c
-      this->_nextStateName = FSMStateName::PASSIVE;
-      break;
+  case FSMStateName::PASSIVE: // normal c
+    this->_nextStateName = FSMStateName::PASSIVE;
+    break;
 
-    case FSMStateName::BALANCE_STAND:
-      if ((int)(_state_iter - fold_ramp_iter - standup_ramp_iter) >= 100)
-        this->_nextStateName = FSMStateName::BALANCE_STAND;
-      break;
+  case FSMStateName::BALANCE_STAND:
+    if ((int)(_state_iter - fold_ramp_iter - standup_ramp_iter) >= 100)
+      this->_nextStateName = FSMStateName::BALANCE_STAND;
+    break;
 
-    case FSMStateName::RL:  // normal c
-      if ((int)(_state_iter - fold_ramp_iter - standup_ramp_iter) >= 100)
-        this->_nextStateName = FSMStateName::RL;
-      break;
-    default:
-      break;
-      // default:
-      // std::cout << "[CONTROL FSM] Bad Request: Cannot transition from "
-      //           << K_RECOVERY_STAND << " to "
-      //           << this->_data->controlParameters->control_mode << std::endl;
+  case FSMStateName::RL: // normal c
+    if ((int)(_state_iter - fold_ramp_iter - standup_ramp_iter) >= 100)
+      this->_nextStateName = FSMStateName::RL;
+    break;
+  default:
+    break;
+    // default:
+    // std::cout << "[CONTROL FSM] Bad Request: Cannot transition from "
+    //           << K_RECOVERY_STAND << " to "
+    //           << this->_data->controlParameters->control_mode << std::endl;
   }
   // Get the next state
   return this->_nextStateName;
