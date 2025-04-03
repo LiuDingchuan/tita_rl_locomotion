@@ -148,13 +148,13 @@ void FSMState_RL::run()
   _data->low_cmd->tau_cmd.setZero();
   for (int i = 0; i < DOF; i++)
   {
-    if (i % (DOF / 2) == (DOF / 2 - 1))
+    if (i % (DOF / 2) == (DOF / 2 - 1)) // 轮子
     {
-      _data->low_cmd->tau_cmd[i] = 12 * desired_pos[i] + 1.5 * (0 - _data->low_state->dq[i]);
+      _data->low_cmd->tau_cmd[i] = 40 * desired_pos[i] + 2.5 * (0 - _data->low_state->dq[i]);
     }
-    else
+    else // 关节？
     {
-      _data->low_cmd->tau_cmd[i] = 60 * (desired_pos[i] - _data->low_state->q[i]) + 2.0 * (0 - _data->low_state->dq[i]);
+      _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 3.0 * (0 - _data->low_state->dq[i]);
     }
   }
 }
@@ -304,7 +304,7 @@ void FSMState_RL::_Run_Forward()
         obs_.dof_pos[i] = _data->low_state->q[i + DOF / 2];
         obs_.dof_vel[i] = _data->low_state->dq[i + DOF / 2];
       }
-      obs_.dof_pos[DOF / 2 - 1] = 0;
+      obs_.dof_pos[DOF / 2 - 1] = 0; // 把两个轮子的位置的观察量都置为0
       obs_.dof_pos[DOF - 1] = 0;
 
       _Forward();
@@ -320,7 +320,12 @@ void FSMState_RL::_Run_Forward()
         desired_pos[i] = action[i + (DOF / 2)];
         // std::cerr << "desired_pos" << i << ":" << desired_pos[i] << std::endl;
       }
-      std::cerr << "desired_pos0: " << desired_pos[0] << " desired_pos1: " << desired_pos[1] << " desired_pos3: " << desired_pos[3] << " des_pos4: " << desired_pos[4] << std::endl;
+      std::cerr << "desired_pos0: " << desired_pos[0]
+                << " desired_pos1: " << desired_pos[1]
+                << " desired_pos2 " << desired_pos[2]
+                << " desired_pos3: " << desired_pos[3]
+                << " des_pos4: " << desired_pos[4]
+                << " des_pos5: " << desired_pos[5] << std::endl;
     }
 
     absoluteWait(_start_time, (long long)(0.01 * 1000000));

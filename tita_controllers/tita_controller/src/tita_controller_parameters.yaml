@@ -16,7 +16,7 @@ tita_controller:
   robot_description_path:
     {
       type: string,
-      default_value: "/usr/share/robot_description/tita/urdf/robot.urdf",
+      default_value: "/usr/share/robot_description/diablo_pluspro_stand/urdf/diablo_pluspro_stand.urdf",
     }
   lqr_update_rate:
     {
@@ -28,14 +28,14 @@ tita_controller:
   wheel_radius:
     {
       type: double,
-      default_value: 0.0925,
+      default_value: 0.16,
       description: "Radius of a wheel, used for transformation of linear velocity into wheel rotations. If this parameter is wrong the robot will move faster or slower then expected.",
     }
 
   wheel_joint_name:
     {
       type: string_array,
-      default_value: ["joint_left_leg_4", "joint_right_leg_4"],
+      default_value: ["left_wheel_joint", "right_wheel_joint"],
       description: "Joint names to control and listen to",
       read_only: true,
       validation: { unique<>: null },
@@ -491,7 +491,8 @@ tita_controller:
     p: {
       type: double_array,
       default_value: [80.0, 80.0, 5.0, 80.0, 80.0, 5.0],
-      description: "Max torque of every joint motor.",
+      description: "p for pid.",
+      
       validation: {
         fixed_size<>: [6],
       }
@@ -499,7 +500,7 @@ tita_controller:
     d: {
       type: double_array,
       default_value: [8.0, 8.0, 0.2, 8.0, 8.0, 0.2],
-      description: "Max torque of every joint motor.",
+      description: "d for pid.",
       validation: {
         fixed_size<>: [6],
       }
@@ -508,8 +509,8 @@ tita_controller:
   wbc_joint_pd:
     p: {
       type: double_array,
-      default_value: [80.0, 80.0, 5.0, 80.0, 80.0, 5.0],
-      description: "Max torque of every joint motor.",
+      default_value: [80.0, 80.0, 15.0, 80.0, 80.0, 15.0],
+      description: "p for pid",
       validation: {
         fixed_size<>: [6],
       }
@@ -517,7 +518,7 @@ tita_controller:
     d: {
       type: double_array,
       default_value: [8.0, 8.0, 0.2, 8.0, 8.0, 0.2],
-      description: "Max torque of every joint motor.",
+      description: "d for pid",
       validation: {
         fixed_size<>: [6],
       }

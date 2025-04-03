@@ -101,7 +101,7 @@
       <parent link="left_hip_link" />
       <child link="left_knee_link" />
       <axis xyz="0 1 0" />
-      <limit lower="-1.57" upper="0" effort="80" velocity="15" />
+      <limit lower="-1.19" upper="0" effort="80" velocity="15" />
     </joint>
 
     <link name="left_wheel_link">
@@ -185,7 +185,7 @@
       <parent link="right_hip_link" />
       <child link="right_knee_link" />
       <axis xyz="0 1 0" />
-      <limit lower="-1.57" upper="0" effort="80" velocity="15" />
+      <limit lower="-1.19" upper="0" effort="80" velocity="15" />
     </joint>
 
     <link name="right_wheel_link">

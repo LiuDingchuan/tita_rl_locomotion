@@ -84,6 +84,7 @@ def generate_launch_description():
             "ctrl_mode": LaunchConfiguration("ctrl_mode"),
             "urdf": urdf,
             "yaml_path": yaml_path,
+            "paused": "true",
         }.items(),
         condition=IfCondition(
             PythonExpression(["'", LaunchConfiguration("sim_env"), "' == 'gazebo'"])
