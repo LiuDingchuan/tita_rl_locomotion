@@ -61,19 +61,19 @@ def generate_launch_description():
         condition=IfCondition(PythonExpression(["'", LaunchConfiguration('sim_env'), "' == 'webots'"]))
     )
 
-    gazebo_controller_manager_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(
-            get_package_share_directory('gazebo_bridge'),
-            'launch',
-            'gazebo_bridge.launch.py'
-        )),
-        launch_arguments={
-            'ctrl_mode': LaunchConfiguration('ctrl_mode'),
-            'urdf': urdf,
-            'yaml_path': yaml_path,
-        }.items(),
-        condition=IfCondition(PythonExpression(["'", LaunchConfiguration('sim_env'), "' == 'gazebo'"]))
-    )
+    # gazebo_controller_manager_launch = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(os.path.join(
+    #         get_package_share_directory('gazebo_bridge'),
+    #         'launch',
+    #         'gazebo_bridge.launch.py'
+    #     )),
+    #     launch_arguments={
+    #         'ctrl_mode': LaunchConfiguration('ctrl_mode'),
+    #         'urdf': urdf,
+    #         'yaml_path': yaml_path,
+    #     }.items(),
+    #     condition=IfCondition(PythonExpression(["'", LaunchConfiguration('sim_env'), "' == 'gazebo'"]))
+    # )
     # add extra controllers launch or node
 
     robot_inertia_launch = IncludeLaunchDescription(PythonLaunchDescriptionSource(os.path.join(
@@ -105,7 +105,7 @@ def generate_launch_description():
 
     return LaunchDescription(declared_arguments + [
         webots_controller_manager_launch,
-        gazebo_controller_manager_launch,
+        # gazebo_controller_manager_launch,
 
         joint_state_broadcaster_spawner,
         imu_sensor_broadcaster_spawner,
