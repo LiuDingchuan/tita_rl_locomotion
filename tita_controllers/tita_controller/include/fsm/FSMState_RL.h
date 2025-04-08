@@ -15,6 +15,7 @@ struct ModelParams
   float damping;
   float stiffness;
   float action_scale;
+  float action_scale_vel;
   float hip_scale_reduction;
   float num_of_dofs;
   float lin_vel_scale;

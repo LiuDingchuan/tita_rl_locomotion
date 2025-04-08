@@ -1,3 +1,11 @@
+/*
+ * @Author: hilab-workshop-ldc 2482812356@qq.com
+ * @Date: 2025-04-03 22:48:26
+ * @LastEditors: hilab-workshop-ldc 2482812356@qq.com
+ * @LastEditTime: 2025-04-04 17:05:49
+ * @FilePath: /tita_rl_sim2sim2real/src/tita_locomotion/tita_controllers/tita_controller/include/common/RobotParameters.h
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 /*! @file RobotParameters.cpp
  *  @brief Declaration of various robot parameters
  *
@@ -18,8 +26,8 @@ struct RobotControlParameters
   RobotControlParameters()
   {
     torque_limit = {70.0, 70.0, 20.0, 70.0, 70.0, 20.0};
-    joint_kp = {80.0, 80.0, 5.0, 80.0, 80.0, 5.0};
-    joint_kd = {8.0, 8.0, 0.2, 8.0, 8.0, 0.2};
+    joint_kp = {40.0, 40.0, 10.0, 40.0, 40.0, 1.0};
+    joint_kd = {1.0, 1.0, 0.5, 1.0, 1.0, 0.5};
     wheel_joint_name = {"left_wheel_joint", "right_wheel_joint"};
   }
   scalar_t wheel_radius{0.16};
