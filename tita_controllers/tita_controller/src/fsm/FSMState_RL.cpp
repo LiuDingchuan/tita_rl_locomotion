@@ -69,7 +69,7 @@ void FSMState_RL::enter()
   }
 
   params_.action_scale = 0.5;
-  params_.action_scale_vel = 6.0;
+  params_.action_scale_vel = 10.0;
   params_.num_of_dofs = DOF;
   params_.lin_vel_scale = 2.0;
   params_.ang_vel_scale = 0.25;
@@ -151,11 +151,11 @@ void FSMState_RL::run()
   {
     if (i % (DOF / 2) == (DOF / 2 - 1)) // 轮子
     {
-      _data->low_cmd->tau_cmd[i] = 10.0 * (desired_pos[i] - _data->low_state->dq[i]);
+      _data->low_cmd->tau_cmd[i] = 0.5 * (desired_pos[i] - _data->low_state->dq[i]);
     }
     else // 关节？
     {
-      _data->low_cmd->tau_cmd[i] = 45 * (desired_pos[i] - _data->low_state->q[i]) + 1.2 * (0 - _data->low_state->dq[i]);
+      _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 1.0 * (0 - _data->low_state->dq[i]);
     }
   }
 }
@@ -239,9 +239,9 @@ void FSMState_RL::_GetObs()
     angle = angle - 2.0 * M_PI;
   }
   ////没懂这里为什么要乘以0.5又乘以0.25,先注释掉试试
-  // angle = angle * 0.5;
+  angle = angle * 0.5;
   angle = std::max(std::min((float)angle, max), min);
-  // angle = angle * 0.25;
+  angle = angle * 0.25;
 
   obs_tmp.push_back(vel);
   obs_tmp.push_back(0.0);

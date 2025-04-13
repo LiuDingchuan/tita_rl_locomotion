@@ -16,7 +16,7 @@ tita_controller:
   robot_description_path:
     {
       type: string,
-      default_value: "/usr/share/robot_description/diablo_pluspro_stand/urdf/diablo_pluspro_stand.urdf",
+      default_value: "/usr/share/robot_description/diablo_pluspro_stand/xacro/robot.xacro",
     }
   lqr_update_rate:
     {
@@ -481,7 +481,7 @@ tita_controller:
 
   torque_limit: {
     type: double_array,
-    default_value: [70.0, 70.0, 15.0, 70.0, 70.0, 15.0],
+    default_value: [80.0, 80.0, 20.0, 80.0, 80.0, 20.0],
     description: "Max torque of every joint motor.",
     validation: {
       fixed_size<>: [6],

@@ -68,11 +68,8 @@ def generate_launch_description():
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[{
-            'robot_description_path': tita_description_path,
-            },
-            robot_controllers
-        ],
+        parameters=[{'robot_description_path': tita_description_path,},
+            robot_controllers],
         output="both",
         remappings=[
             ("~/robot_description", "/robot_description"),

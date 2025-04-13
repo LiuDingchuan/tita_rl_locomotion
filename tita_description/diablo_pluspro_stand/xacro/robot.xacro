@@ -6,7 +6,8 @@
   <xacro:property name="sim_env" value="$(arg sim_env)" />
   <xacro:property name="ctrl_mode" value="$(arg ctrl_mode)" />
   <xacro:arg name="yaml_path" default="" />
-
+  
+  <xacro:include filename="$(find tita_description)/diablo_pluspro_stand/xacro/gazebo.xacro" />
   <xacro:include filename="$(find tita_description)/diablo_pluspro_stand/xacro/materials.xacro" />
   <xacro:include filename="$(find tita_description)/diablo_pluspro_stand/xacro/description.xacro" />
   <xacro:include filename="$(find tita_description)/diablo_pluspro_stand/xacro/ros2control.xacro" />
