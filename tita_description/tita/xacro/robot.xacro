@@ -10,6 +10,7 @@
   <xacro:include filename="$(find tita_description)/tita/xacro/materials.xacro" />
   <xacro:include filename="$(find tita_description)/tita/xacro/description.xacro" />
   <xacro:include filename="$(find tita_description)/tita/xacro/ros2control.xacro" />
+  <xacro:include filename="$(find tita_description)/tita/xacro/gazebo.xacro" />
 
   <xacro:if value="$(arg use_tower)">
     <xacro:include filename="$(find tita_description)/tower/xacro/tower.urdf.xacro" />

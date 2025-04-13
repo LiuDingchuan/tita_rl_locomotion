@@ -86,7 +86,7 @@ void FSMState_RL::enter()
   }
 
   x_vel_cmd_ = 0.;
-  pitch_cmd_ = 0.;
+  yaw_vel_cmd_ = 0.;
 
   for (int i = 0; i < temp_history_len_all; i++)
     input_1.get()[i] = 0;
@@ -140,7 +140,7 @@ void FSMState_RL::run()
   // _data->state_command->clear();
   // _data->low_cmd->zero();
   x_vel_cmd_ = _data->state_command->rc_data_->twist_linear[point::X];
-  pitch_cmd_ = _data->state_command->rc_data_->twist_angular[point::Z];
+  yaw_vel_cmd_ = _data->state_command->rc_data_->twist_angular[point::Z];
   // _data->state_command->rc_data_->twist_angular[point::Z]
   _data->low_cmd->qd.setZero();
   _data->low_cmd->qd_dot.setZero();
@@ -155,6 +155,7 @@ void FSMState_RL::run()
     }
     else // 关节？
     {
+      _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 1.0 * (0 - _data->low_state->dq[i]);
       _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 1.0 * (0 - _data->low_state->dq[i]);
     }
   }
@@ -203,8 +204,9 @@ void FSMState_RL::_GetObs()
   Mat3<double> _B2G_RotMat = this->_data->state_estimator->getResult().rBody;
   Mat3<double> _G2B_RotMat = this->_data->state_estimator->getResult().rBody.transpose();
 
-  Vec3<double> angvel = a_l;
+  Vec3<double> base_ang_vel = a_l;
   a_l = 0.97 * this->_data->state_estimator->getResult().omegaBody + 0.03 * a_l;
+  // a_l = 1.0 * this->_data->state_estimator->getResult().omegaBody;
   Vec3<double> projected_gravity = _B2G_RotMat * Vec3<double>(0.0, 0.0, -1.0);
   Vec3<double> projected_forward = _G2B_RotMat * Vec3<double>(1.0, 0.0, 0.0);
   // gravity
@@ -212,40 +214,22 @@ void FSMState_RL::_GetObs()
   // _gyFilter->addValue(angvel(1,0));
   // _gzFilter->addValue(angvel(2,0));
   //
-  obs_tmp.push_back(angvel(0) * params_.ang_vel_scale);
-  obs_tmp.push_back(angvel(1) * params_.ang_vel_scale);
-  obs_tmp.push_back(angvel(2) * params_.ang_vel_scale);
+  obs_tmp.push_back(base_ang_vel(0) * params_.ang_vel_scale);
+  obs_tmp.push_back(base_ang_vel(1) * params_.ang_vel_scale);
+  obs_tmp.push_back(base_ang_vel(2) * params_.ang_vel_scale);
 
   for (int i = 0; i < 3; ++i)
   {
     obs_tmp.push_back(projected_gravity(i));
   }
 
-  // cmd
-  float rx = pitch_cmd_; // rx * (1 - smooth) + (std::fabs(_lowState->userValue.rx) < dead_zone ? 0.0 : _lowState->userValue.rx) * smooth;
-  float ly = x_vel_cmd_; // ly * (1 - smooth) + (std::fabs(_lowState->userValue.ly) < dead_zone ? 0.0 : _lowState->userValue.ly) * smooth;
+  float command_x = x_vel_cmd_ * params_.lin_vel_scale;
+  float command_yaw = yaw_vel_cmd_ * params_.ang_vel_scale;
 
-  float max = 1.0;
-  float min = -1.0;
-
-  float rot = rx * 3.14;
-  float vel = ly * params_.lin_vel_scale;
-
-  double heading = 0.;
-  double angle = (double)rot - heading;
-  angle = fmod(angle, 2.0 * M_PI);
-  if (angle > M_PI)
-  {
-    angle = angle - 2.0 * M_PI;
-  }
-  ////没懂这里为什么要乘以0.5又乘以0.25,先注释掉试试
-  angle = angle * 0.5;
-  angle = std::max(std::min((float)angle, max), min);
-  angle = angle * 0.25;
-
-  obs_tmp.push_back(vel);
+  obs_tmp.push_back(command_x);
   obs_tmp.push_back(0.0);
-  obs_tmp.push_back(angle);
+  obs_tmp.push_back(command_yaw);
+  // std::cout << "angle: " << command_yaw << " ang_vel_now " << base_ang_vel(2) << std::endl;
 
   // pos
   for (int i = 0; i < DOF; ++i)

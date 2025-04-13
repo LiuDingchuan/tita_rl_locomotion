@@ -79,6 +79,8 @@ private:
   int n_priv_latent = 30;
   int temp_history_len_all = 270 - 27;
 
+  float yaw_vel_cmd_;
+
 private:
   ModelParams params_;
   Observations obs_;
