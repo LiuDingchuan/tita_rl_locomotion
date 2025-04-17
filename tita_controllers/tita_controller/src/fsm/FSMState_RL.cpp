@@ -27,8 +27,7 @@ void FSMState_RL::enter()
 {
   _data->state_command->firstRun = true;
 
-  int DOF_of_single_leg = DOF / 2;
-  if (DOF_of_single_leg == 4)
+  if (DOF / 2 == 4)
   {
     for (int i = 0; i < 2; i++)
     {
@@ -46,7 +45,7 @@ void FSMState_RL::enter()
       obs_.dof_vel[i] = _data->low_state->dq[i + 4];
     }
   }
-  else if (DOF_of_single_leg == 3)
+  else if (DOF / 2 == 3)
   {
     for (int i = 0; i < 2; i++)
     {
@@ -70,6 +69,7 @@ void FSMState_RL::enter()
 
   params_.action_scale = 0.5;
   params_.action_scale_vel = 10.0;
+  params_.hip_scale_reduction = 0.5;
   params_.num_of_dofs = DOF;
   params_.lin_vel_scale = 2.0;
   params_.ang_vel_scale = 0.25;
@@ -103,7 +103,7 @@ void FSMState_RL::enter()
   }
   a_l.setZero();
 
-  for (int i = 0; i < history_length; i++)
+  for (int i = 0; i < history_len; i++)
   {
     // torch::Tensor obs_tensor = GetObs();
     // // append obs to obs buffer
@@ -151,11 +151,10 @@ void FSMState_RL::run()
   {
     if (i % (DOF / 2) == (DOF / 2 - 1)) // 轮子
     {
-      _data->low_cmd->tau_cmd[i] = 0.5 * (desired_pos[i] - _data->low_state->dq[i]);
+      _data->low_cmd->tau_cmd[i] = 10 * desired_pos[i] - 0.5 * _data->low_state->dq[i];
     }
     else // 关节？
     {
-      _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 1.0 * (0 - _data->low_state->dq[i]);
       _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 1.0 * (0 - _data->low_state->dq[i]);
     }
   }
@@ -299,8 +298,10 @@ void FSMState_RL::_Run_Forward()
       {
         action[j] = output.get()[j] * params_.action_scale + params_.default_dof_pos[j];
       }
-      action[DOF / 2 - 1] = output.get()[DOF / 2 - 1] * params_.action_scale_vel;
-      action[DOF - 1] = output.get()[DOF - 1] * params_.action_scale_vel;
+      action[0] *= params_.hip_scale_reduction;
+      action[3] *= params_.hip_scale_reduction;
+      // action[DOF / 2 - 1] = output.get()[DOF / 2 - 1] * params_.action_scale_vel;
+      // action[DOF - 1] = output.get()[DOF - 1] * params_.action_scale_vel;
       // 换位？左腿换右腿(因为RL里面是反的)
       for (int i = 0; i < DOF / 2; i++)
       {

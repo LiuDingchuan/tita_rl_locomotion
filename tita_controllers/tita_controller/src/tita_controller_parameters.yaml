@@ -410,7 +410,7 @@ tita_controller:
       default_value: 
         {
           type: double,
-          default_value: 0.285,
+          default_value: 0.403,
           description: "Distance between the two wheels",
           # read_only: true,
         }

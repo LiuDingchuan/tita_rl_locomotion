@@ -152,7 +152,7 @@ namespace tita_locomotion
     imu_sensor_->get_orientation()[1], imu_sensor_->get_orientation()[2]);
     // clang-format on
     // Control Update
-    if (init_estimator_count_ > 100)
+    if (init_estimator_count_ > 0)
       controlData_->state_estimator->run();
     else
       init_estimator_count_++;

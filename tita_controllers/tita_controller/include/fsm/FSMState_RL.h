@@ -107,8 +107,6 @@ private:
   std::shared_ptr<float[]> output_last;
   std::shared_ptr<float[]> input_1_temp;
 
-  int history_length = 10;
-
   void _GetObs();
   Vec3<double> a_l;
 

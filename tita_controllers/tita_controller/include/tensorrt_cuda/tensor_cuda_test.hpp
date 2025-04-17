@@ -24,9 +24,9 @@ private:
   void cuda_memory_init(void);
   // Cuda pipeline config.
   float *buffers[3];
-  size_t input_size_0 = 33 * sizeof(float);
-  size_t input_size_1 = 33 * 10 * sizeof(float);
-  size_t output_size = 8 * sizeof(float);
+  size_t input_size_0 = 27 * sizeof(float);
+  size_t input_size_1 = 27 * 10 * sizeof(float);
+  size_t output_size = 6 * sizeof(float);
   cudaStream_t stream;
   nvinfer1::ICudaEngine *engine_;
   nvinfer1::IExecutionContext *context;
