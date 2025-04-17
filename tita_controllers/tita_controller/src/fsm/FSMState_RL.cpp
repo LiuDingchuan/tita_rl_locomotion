@@ -44,6 +44,7 @@ void FSMState_RL::enter()
   }
 
   params_.action_scale = 0.5;
+  params_.hip_scale_reduction = 0.5;
   params_.num_of_dofs = 8;
   params_.lin_vel_scale = 2.0;
   params_.ang_vel_scale = 0.25;
@@ -293,6 +294,8 @@ void FSMState_RL::_Run_Forward()
       {
         action[j] = output.get()[j] * params_.action_scale + params_.default_dof_pos[j];
       }
+      action[0] *= params_.hip_scale_reduction;
+      action[3] *= params_.hip_scale_reduction;
 
       for (int i = 0; i < 4; i++)
       {
