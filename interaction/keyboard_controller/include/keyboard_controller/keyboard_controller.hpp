@@ -1,3 +1,11 @@
+/*
+ * @Author: hilab-workshop-ldc 2482812356@qq.com
+ * @Date: 2025-03-20 15:25:00
+ * @LastEditors: hilab-workshop-ldc 2482812356@qq.com
+ * @LastEditTime: 2025-04-23 17:25:57
+ * @FilePath: /tita_rl_sim2sim2real/src/tita_locomotion/interaction/keyboard_controller/include/keyboard_controller/keyboard_controller.hpp
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 #include <termios.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2/LinearMath/Quaternion.h>
@@ -39,7 +47,7 @@ using namespace std::chrono_literals;
 class KeyboardControllerNode : public rclcpp::Node
 {
 public:
-  KeyboardControllerNode(const rclcpp::NodeOptions & options);
+  KeyboardControllerNode(const rclcpp::NodeOptions &options);
 
 private:
   template <typename scalar_t>
@@ -48,7 +56,7 @@ private:
     return std::max(min, std::min(value, max));
   }
   void print_interface();
-  int get_key();
+  int get_key(bool &key_released);
 
   void ReadKeyThread();
   void PubCmdVelCallBack();
@@ -57,16 +65,19 @@ private:
   std::shared_ptr<rclcpp::Publisher<geometry_msgs::msg::PoseStamped>> posestamped_publisher_;
   std::shared_ptr<rclcpp::Publisher<std_msgs::msg::String>> fsm_goal_publisher_;
   std::shared_ptr<realtime_tools::RealtimePublisher<geometry_msgs::msg::Twist>>
-    realtime_cmd_vel_publisher_;
+      realtime_cmd_vel_publisher_;
   std::shared_ptr<realtime_tools::RealtimePublisher<geometry_msgs::msg::PoseStamped>>
-    realtime_posestamped_publisher_;
+      realtime_posestamped_publisher_;
   std::shared_ptr<realtime_tools::RealtimePublisher<std_msgs::msg::String>>
-    realtime_fsm_goal_publisher_;
+      realtime_fsm_goal_publisher_;
 
   rclcpp::TimerBase::SharedPtr timer_;
   geometry_msgs::msg::Twist twist_;
   geometry_msgs::msg::PoseStamped pose_;
   std_msgs::msg::String fsm_goal_;
+  bool key_released;
+  int now_key{-1};
+  int last_key{-1};
   double rpy_[3];
-  double speed_scale_{1.0}, pose_scale_{1.0};
+  double speed_scale_{2.0}, pose_scale_{1.0};
 };

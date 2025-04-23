@@ -63,30 +63,82 @@ void KeyboardControllerNode::print_interface()
             << std::endl;
 
   std::cout << "  y:    " << std::setw(6) << YELLOW << pose_.pose.position.y << RESET
-            << "   z:   " << std::setw(6) << YELLOW << pose_.pose.position.z << RESET << std::endl;
+            << "   z:   " << std::setw(6) << YELLOW << pose_.pose.position.z << RESET
+            << "   key_released :" << this->key_released << "     now_key:  " << this->now_key << std::endl;
 }
-
-int KeyboardControllerNode::get_key()
+/**
+ * @description: 获取案件状态（非阻塞模式）
+ * @param {int} &key_released
+ * @return {*}
+ */
+int KeyboardControllerNode::get_key(bool &key_released)
 {
-  int ch;
-  struct termios oldt;
-  struct termios newt;
+  static int last_ch = -1;                                      // 缓存上一次的按键状态
+  static auto last_time = std::chrono::steady_clock::now();     // 上一次检测时间
+  static auto debounce_time = std::chrono::steady_clock::now(); // 消抖时间
 
+  int ch = -1;
+  struct termios oldt, newt;
+  fd_set readfds;
+  struct timeval timeout;
+
+  // 获取终端设置
   tcgetattr(STDIN_FILENO, &oldt);
   newt = oldt;
 
+  // 设置非阻塞模式
   newt.c_lflag &= ~(ICANON | ECHO);
-  newt.c_iflag |= IGNBRK;
-  newt.c_iflag &= ~(INLCR | ICRNL | IXON | IXOFF);
-  newt.c_lflag &= ~(ICANON | ECHO | ECHOK | ECHOE | ECHONL | ISIG | IEXTEN);
-  newt.c_cc[VMIN] = 1;
-  newt.c_cc[VTIME] = 0;
-  tcsetattr(fileno(stdin), TCSANOW, &newt);
+  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
-  ch = getchar();
+  // 初始化文件描述符集合
+  FD_ZERO(&readfds);
+  FD_SET(STDIN_FILENO, &readfds);
 
+  // 设置超时时间为 0 秒（非阻塞）
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 0;
+
+  // 检测是否有输入
+  if (select(STDIN_FILENO + 1, &readfds, NULL, NULL, &timeout) > 0)
+  {
+    // 检查是否满足消抖时间
+    ch = getchar(); // 获取按键
+    auto now = std::chrono::steady_clock::now();
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - debounce_time).count() > 300)
+    {
+      key_released = false; // 按键被按下
+      last_ch = ch;         // 更新缓存的按键状态
+      last_time = now;      // 更新检测时间
+      debounce_time = now;  // 更新消抖时间
+    }
+    else
+    {
+      ch = -1; // 忽略按键（消抖）
+    }
+  }
+  else
+  {
+    // 检测按键弹起的条件：当前没有输入，且距离上次按键按下超过一定时间
+    auto now = std::chrono::steady_clock::now();
+    if (last_ch != -1 && std::chrono::duration_cast<std::chrono::milliseconds>(now - last_time).count() > 500)
+    {
+      key_released = true; // 按键被释放
+      last_ch = -1;        // 重置缓存的按键状态
+    }
+    // else
+    // {
+    //   key_released = false; // 按键状态保持不变
+    // }
+    // std::cout << "now: "
+    //           << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count()
+    //           << " ms, last_time: "
+    //           << std::chrono::duration_cast<std::chrono::milliseconds>(last_time.time_since_epoch()).count()
+    //           << " ms" << std::endl;
+  }
+
+  // 恢复终端设置
   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-  // std::cout << "ch : " << ch << std::endl;
+  // std::cout << "key_released: " << key_released << " last_ch: " << last_ch << std::endl;
   return ch;
 }
 
@@ -94,98 +146,123 @@ void KeyboardControllerNode::ReadKeyThread()
 {
   while (rclcpp::ok())
   {
-    switch (get_key())
+    this->now_key = get_key(this->key_released);
+
+    if (!this->key_released)
     {
-    case '0':
-      fsm_goal_.data = "idle";
-      break;
-    case '1':
-      fsm_goal_.data = "transform_up";
-      break;
-    case '2':
-      fsm_goal_.data = "rl";
-      break;
-    case '3':
-      fsm_goal_.data = "transform_down";
-      break;
-    case 'w':
-      twist_.linear.x += STEP_ACCL_X * speed_scale_;
-      break;
-    case 'x':
-      twist_.linear.x -= STEP_ACCL_X * speed_scale_;
-      break;
-    case 'a':
-      twist_.angular.z += STEP_ACCL_W * speed_scale_;
-      break;
-    case 'd':
-      twist_.angular.z -= STEP_ACCL_W * speed_scale_;
-      break;
-    case 's':
-      twist_.linear.x = 0.0;
-      twist_.angular.z = 0.0;
-      break;
-    case '+':
-      speed_scale_ += 0.1;
-      break;
-    case '-':
-      speed_scale_ -= 0.1;
-      break;
-    case '*':
-      pose_scale_ += 0.1;
-      break;
-    case '/':
-      pose_scale_ -= 0.1;
-      break;
-    case '\033':
-      if (get_key() == '[')
+      switch (this->now_key)
       {
-        switch (get_key())
+      case '0':
+        fsm_goal_.data = "idle";
+        break;
+      case '1':
+        fsm_goal_.data = "transform_up";
+        break;
+      case '2':
+        fsm_goal_.data = "rl";
+        break;
+      case '3':
+        fsm_goal_.data = "transform_down";
+        break;
+      case 'w':
+        twist_.linear.x += STEP_ACCL_X * speed_scale_;
+        break;
+      case 's':
+        twist_.linear.x -= STEP_ACCL_X * speed_scale_;
+        break;
+      case 'a':
+        twist_.angular.z += STEP_ACCL_W * speed_scale_;
+        break;
+      case 'd':
+        twist_.angular.z -= STEP_ACCL_W * speed_scale_;
+        break;
+      // case 's':
+      //   twist_.linear.x = 0.0;
+      //   twist_.angular.z = 0.0;
+      //   break;
+      case '+':
+        speed_scale_ += 0.1;
+        break;
+      case '-':
+        speed_scale_ -= 0.1;
+        break;
+      case '*':
+        pose_scale_ += 0.1;
+        break;
+      case '/':
+        pose_scale_ -= 0.1;
+        break;
+      case '\033':
+        if (now_key == '[')
         {
-        case 'A': // Up
-          pose_.pose.position.z += STEP_HEIGHT * pose_scale_;
-          break;
-        case 'B': // Down
-          pose_.pose.position.z -= STEP_HEIGHT * pose_scale_;
-          break;
-        case 'C': // Right
-          pose_.pose.position.y -= STEP_POSITION * pose_scale_;
-          break;
-        case 'D': // Left
-          pose_.pose.position.y += STEP_POSITION * pose_scale_;
-          break;
-        default:
-          break;
+          switch (now_key)
+          {
+          case 'A': // Up
+            pose_.pose.position.z += STEP_HEIGHT * pose_scale_;
+            break;
+          case 'B': // Down
+            pose_.pose.position.z -= STEP_HEIGHT * pose_scale_;
+            break;
+          case 'C': // Right
+            pose_.pose.position.y -= STEP_POSITION * pose_scale_;
+            break;
+          case 'D': // Left
+            pose_.pose.position.y += STEP_POSITION * pose_scale_;
+            break;
+          default:
+            break;
+          }
         }
+        break;
+      case 'i':
+        rpy_[1] += STEP_ORIENTATION * pose_scale_;
+        break;
+      case ',':
+        rpy_[1] -= STEP_ORIENTATION * pose_scale_;
+        break;
+      case 'j':
+        rpy_[0] -= STEP_ORIENTATION * pose_scale_;
+        break;
+      case 'l':
+        rpy_[0] += STEP_ORIENTATION * pose_scale_;
+        break;
+      case 'u':
+        rpy_[2] -= STEP_ORIENTATION * pose_scale_;
+        break;
+      case 'o':
+        rpy_[2] += STEP_ORIENTATION * pose_scale_;
+        break;
+      case 'k':
+        pose_.pose.position.y = 0;
+        rpy_[0] = rpy_[1] = rpy_[2] = 0;
+        break;
+      case '\x03': // Ctrl+C
+        std::cout << "KEYBOARD WILL BE BACK..." << std::endl;
+        rclcpp::shutdown();
+        break;
+      default:
+        break;
       }
-      break;
-    case 'i':
-      rpy_[1] += STEP_ORIENTATION * pose_scale_;
-      break;
-    case ',':
-      rpy_[1] -= STEP_ORIENTATION * pose_scale_;
-      break;
-    case 'j':
-      rpy_[0] -= STEP_ORIENTATION * pose_scale_;
-      break;
-    case 'l':
-      rpy_[0] += STEP_ORIENTATION * pose_scale_;
-      break;
-    case 'u':
-      rpy_[2] -= STEP_ORIENTATION * pose_scale_;
-      break;
-    case 'o':
-      rpy_[2] += STEP_ORIENTATION * pose_scale_;
-      break;
-    case 'k':
-      pose_.pose.position.y = 0;
-      rpy_[0] = rpy_[1] = rpy_[2] = 0;
-      break;
-    case '\x03': // Ctrl+C
-      std::cout << "KEYBOARD WILL BE BACK..." << std::endl;
-      rclcpp::shutdown();
-      break;
-    default:
-      break;
+      this->last_key = this->now_key;
+    }
+    else
+    {
+      // switch (last_key)
+      // {
+      // case 'w':
+      // case 'x':
+      twist_.linear.x = 0.0;  // stop linear velocity
+                              //   break;
+                              // case 'a':
+                              // case 'd':
+      twist_.angular.z = 0.0; // stop angular velocity
+      //   break;
+
+      // default:
+      //   break;
+      // }
+      // std::cout << "key released: " << key_released << " last_key: " << last_key << " now_key: " << key << std::endl;
+      last_key = -1;
     }
     speed_scale_ = clamp(speed_scale_, 0.1, 4.0);
     pose_scale_ = clamp(pose_scale_, 0.1, 4.0);
@@ -204,6 +281,7 @@ void KeyboardControllerNode::ReadKeyThread()
     pose_.pose.position.y = clamp(pose_.pose.position.y, -MAX_POSITION, MAX_POSITION);
     pose_.pose.position.z = clamp(pose_.pose.position.z, MIN_HEIGHT, MAX_HEIGHT);
     print_interface();
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 }
 
