@@ -15,6 +15,7 @@
   <depend>sensor_msgs</depend>
   <depend>pluginlib</depend>
   <depend>controller_manager</depend>
+  <depend>diablo_joint_sdk</depend>
   <depend>tita_robot</depend>
 
   <build_depend>hardware_interface</build_depend>

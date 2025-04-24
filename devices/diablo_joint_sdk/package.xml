@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>diablo_joint_sdk</name>
+  <version>0.0.0</version>
+  <description>ROS control warped interface for DDT Diablo</description>
+  <maintainer email="wencong@directdrivetech.com">wex</maintainer>
+
+  <license>BSD</license>
+  <author email="wencong@directdrivetech.com">wex</author>
+
+  <!-- <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>cmake_clang_tools</build_depend>
+  <depend>roscpp</depend>
+  <depend>robot_common</depend>
+  <depend>controller_manager</depend>
+  <depend>urdf</depend> -->
+  <export>
+  <build_type>ament_cmake</build_type>
+  </export>
+</package>

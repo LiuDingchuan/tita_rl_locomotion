@@ -30,60 +30,64 @@
 #include "rclcpp/macros.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
-#include "tita_robot/tita_robot.hpp"
+// #include "tita_robot/tita_robot.hpp"
+#include "serial_handle.hpp"
 
 namespace tita_locomotion
 {
+  constexpr float POS_SCALE = 5215.03f; //  1/32767 * 6.28
+  constexpr float VEL_SCALE = 655.34f;  //   1/32767 * 50
+  constexpr float TAU_SCALE = 655.34f;  //   1/32767 * 50
+  struct Joint
+  {
+    double position = 0.0f;
+    double velocity = 0.0f;
+    double effort = 0.0f;
 
-struct Joint
-{
-  double position = 0.0f;
-  double velocity = 0.0f;
-  double effort = 0.0f;
-  
-  double effortCommand = 0.0f;
-  double positionCommand = 0.0f;
-  double velocityCommand = 0.0f;
-  double kp = 0.0f;
-  double kd = 0.0f;
-  std::string name;
-};
+    double effortCommand = 0.0f;
+    double positionCommand = 0.0f;
+    double velocityCommand = 0.0f;
+    double kp = 0.0f;
+    double kd = 0.0f;
+    std::string name;
+  };
 
-struct InertiaUnit
-{
-  std::string name;
-  double linear_acceleration[3];
-  double angular_velocity[3];
-  double orientation[4];  // x y z w
-};
+  struct InertiaUnit
+  {
+    std::string name;
+    double linear_acceleration[3];
+    double angular_velocity[3];
+    double orientation[4]; // x y z w
+  };
 
-class HardwareBridge : public hardware_interface::SystemInterface
-{
-public:
-  HardwareBridge();
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_init(
-    const hardware_interface::HardwareInfo & info) override;
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(
-    const rclcpp_lifecycle::State & /*previous_state*/) override;
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(
-    const rclcpp_lifecycle::State & /*previous_state*/) override;
+  class HardwareBridge : public hardware_interface::SystemInterface
+  {
+  public:
+    HardwareBridge();
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_init(
+        const hardware_interface::HardwareInfo &info) override;
+    // rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(
+    //     const rclcpp_lifecycle::State & /*previous_state*/) override;
+    // rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(
+    //     const rclcpp_lifecycle::State & /*previous_state*/) override;
 
-  std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
-  std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
-  hardware_interface::return_type read(
-    const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/) override;
-  hardware_interface::return_type write(
-    const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/) override;
+    std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+    std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
+    hardware_interface::return_type read(
+        const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/) override;
+    hardware_interface::return_type write(
+        const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/) override;
 
-private:
-  // rclcpp::Node::SharedPtr node_;
-  // rclcpp::executors::SingleThreadedExecutor executor_;
-  std::vector<Joint> mJoints;
-  InertiaUnit mImu;
-private:
-  std::unique_ptr<tita_robot> robot_; 
-  bool direct_mode_ = false;
-};
-}  // namespace tita_locomotion
+  private:
+    std::vector<Joint> mJoints;
+    InertiaUnit mImu;
+    std::shared_ptr<SerialHandle> diablo_joint_sdk_;
+    motor_torque_t sendStruct_;
+    std::vector<double> joint_direction_ = {-1., -1., 1., -1., -1., 1.};
+    std::vector<double> joint_offset_ = {3.796091, -0.346779, 0., 3.796091, -0.346779, 0.};
+    // std::unique_ptr<tita_robot> robot_;
+    bool direct_mode_ = false;
+  };
+} // namespace tita_locomotion
 
-#endif  // HARDWARE_BRIDGE__HARDWARE_BRIDGE_NODE_HPP_
+#endif // HARDWARE_BRIDGE__HARDWARE_BRIDGE_NODE_HPP_
