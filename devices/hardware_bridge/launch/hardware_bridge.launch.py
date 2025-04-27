@@ -145,7 +145,7 @@ def generate_launch_description():
     )
 
     nodes = [
-        command_node,
+        # command_node,
         # motors_status_node,
         control_node,
         robot_state_pub_node,
