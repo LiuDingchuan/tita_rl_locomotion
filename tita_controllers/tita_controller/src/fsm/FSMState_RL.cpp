@@ -12,14 +12,14 @@
  */
 
 FSMState_RL::FSMState_RL(std::shared_ptr<ControlFSMData> data)
-    : FSMState(data, FSMStateName::RL, "rl"),
+    : FSMState(data, FSMStateName::RL, "idle"),
       input_0(new float[n_prio]),
       input_1(new float[n_prio * history_len]),
       output(new float[DOF]),
       output_last(new float[DOF]),
       input_1_temp(new float[temp_history_len_all])
 {
-  cuda_test_ = std::make_shared<CudaTest>("/home/hilabldc/tita_rl/logs/diablo_pluspro/exported/policies/model_gn.engine");
+  cuda_test_ = std::make_shared<CudaTest>("/home/wex/rl_model/model_gn.engine");
   std::cout << "cuda init :" << cuda_test_->get_cuda_init() << std::endl;
 }
 

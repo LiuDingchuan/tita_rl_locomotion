@@ -13,7 +13,7 @@ nvinfer1::ICudaEngine *CudaTest::get_engine(const std::string &engine_file_path)
   nvinfer1::IRuntime *runtime = nvinfer1::createInferRuntime(gLogger);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  return runtime->deserializeCudaEngine(engine_data.data(), engine_data.size(), nullptr);
+  return runtime->deserializeCudaEngine(engine_data.data(), engine_data.size());
 #pragma GCC diagnostic pop
 }
 
@@ -31,12 +31,16 @@ void CudaTest::do_inference(
   cudaMemcpyAsync(buffers[0], input_0, input_size_0, cudaMemcpyHostToDevice, stream);
   cudaMemcpyAsync(buffers[1], input_1, input_size_1, cudaMemcpyHostToDevice, stream);
 // context->enqueue(1, (void**)buffers, stream, nullptr);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  context->enqueueV2(reinterpret_cast<void **>(buffers), stream, nullptr);
-#pragma GCC diagnostic pop
-  cudaMemcpyAsync(output, buffers[2], output_size, cudaMemcpyDeviceToHost, stream);
+// #pragma GCC diagnostic push
+// #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+//   context->enqueueV2(reinterpret_cast<void **>(buffers), stream, nullptr);
+// #pragma GCC diagnostic pop
+  context->setTensorAddress("onnx::Unsqueeze_0",buffers[0]);
+  context->setTensorAddress("onnx::Slice_1",buffers[1]);
+  context->setTensorAddress("71",buffers[2]);
+  context->enqueueV3(stream);  // 使用 enqueueV3
   cudaStreamSynchronize(stream);
+  cudaMemcpyAsync(output, buffers[2], output_size, cudaMemcpyDeviceToHost, stream);
 }
 
 bool CudaTest::get_cuda_init(void) { return cuda_init; }

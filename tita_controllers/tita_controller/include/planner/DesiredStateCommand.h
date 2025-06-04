@@ -28,7 +28,7 @@ public:
     scalar_t two_wheel_distance;
     void zero()
     {
-      fsm_name_ = "rl";
+      fsm_name_ = "idle";
       twist_linear.Zero();
       twist_angular.Zero();
       pose_position.Zero();
