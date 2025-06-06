@@ -66,7 +66,7 @@ def generate_launch_description():
     # Initialize Arguments
     # save urdf
     robot_description_content_dir = PathJoinSubstitution(
-        [FindPackageShare("tita_description"), "diablo_pluspro_stand" , "xacro",  LaunchConfiguration('urdf')]
+        [FindPackageShare("tita_description"), "diablo_plus_pro" , "xacro",  LaunchConfiguration('urdf')]
     )
     xacro_executable = FindExecutable(name="xacro")
 

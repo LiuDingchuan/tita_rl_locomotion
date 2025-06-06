@@ -45,7 +45,8 @@ FSMState_RecoveryStand::FSMState_RecoveryStand(std::shared_ptr<ControlFSMData> d
   {
     // goal configuration
     // Folding
-    fold_jpos << -0.19, -1.19, 0.0, -0.19, -1.19, 0.0;
+    // fold_jpos << -0.19, -1.19, 0.0, -0.19, -1.19, 0.0;
+    fold_jpos << 0, 0, 0.0, 0, 0, 0.0;
     // Stand Up
     stand_jpos << -0.184481302, -1.194677873, 0.0, -0.184481302, -1.194677873, 0.0;
     // Rolling
@@ -76,13 +77,13 @@ void FSMState_RecoveryStand::enter()
   // initial_jpos(3) = initial_jpos(7) = 0;
   if (dof == 8)
   {
-    fold_jpos(3) = initial_jpos(3);
+    fold_jpos(3) = initial_jpos(3); // 轮子的位置重置
     fold_jpos(7) = initial_jpos(7);
   }
   else if (dof == 6)
   {
     std::cout << "dof == 6, using diablo_plus_pro" << std::endl;
-    fold_jpos(2) = initial_jpos(2);
+    fold_jpos(2) = initial_jpos(2); // 轮子的位置重置
     fold_jpos(5) = initial_jpos(5);
   }
   fold_ramp_iter = fold_ramp_iter * (initial_jpos - fold_jpos).cwiseAbs().maxCoeff(); //
@@ -276,7 +277,11 @@ void FSMState_RecoveryStand::_FoldLegs(const int &curr_iter)
     _motion_start_iter = _state_iter + 1;
   }
 }
-
+/**
+ * @description: diablo_pluspro专属抬头动作
+ * @param {int} &curr_iter
+ * @return {*}
+ */
 void FSMState_RecoveryStand::_HeadUp(const int &curr_iter)
 {
   Eigen::Map<DVec<scalar_t>> kp_joint(

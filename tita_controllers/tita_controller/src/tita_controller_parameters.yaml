@@ -16,7 +16,7 @@ tita_controller:
   robot_description_path:
     {
       type: string,
-      default_value: "/usr/share/robot_description/diablo_pluspro_stand/xacro/robot.xacro",
+      default_value: "/usr/share/robot_description/diablo_plus_pro/xacro/robot.xacro",
     }
   lqr_update_rate:
     {
