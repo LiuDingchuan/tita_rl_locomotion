@@ -28,6 +28,7 @@ FSMState_RecoveryStand::FSMState_RecoveryStand(std::shared_ptr<ControlFSMData> d
   fold_jpos.setZero(dof);
   stand_jpos.setZero(dof);
   rolling_jpos.setZero(dof);
+  headup_jpos.setZero(dof);
   initial_jpos.setZero(dof);
   f_ff.setZero(dof);
   if (dof == 8)
@@ -50,6 +51,7 @@ FSMState_RecoveryStand::FSMState_RecoveryStand(std::shared_ptr<ControlFSMData> d
     stand_jpos << -0.184481302, -1.194677873, 0.0, -0.184481302, -1.194677873, 0.0;
     // Rolling
     rolling_jpos << 0.0f, -0.0f, 0.0f, 0.0f, 0.0f, 0.0f;
+    headup_jpos << -0.19, -1.19, 0.0, -0.19, -1.19, 0.0f;
     f_ff << 0.f, -25.f, 0.f, 0.f, -25.f, 0.f;
   }
 }
@@ -63,7 +65,7 @@ void FSMState_RecoveryStand::enter()
   fold_ramp_iter = timer_fold * _data->params->update_rate;
   standup_ramp_iter = timer_standup * _data->params->update_rate;
   rollover_ramp_iter = timer_rollover * _data->params->update_rate;
-
+  headup_ramp_iter = timer_headup * _data->params->update_rate;
   // // Reset the transition data
   // this->transitionData.zero();
 
@@ -86,6 +88,7 @@ void FSMState_RecoveryStand::enter()
     fold_jpos(5) = initial_jpos(5);
   }
   fold_ramp_iter = fold_ramp_iter * (initial_jpos - fold_jpos).cwiseAbs().maxCoeff(); //
+  headup_ramp_iter = headup_ramp_iter * (initial_jpos - headup_jpos).cwiseAbs().maxCoeff();
   // PRINT_MAT(initial_jpos - fold_jpos);
   // printf("fold_ramp_iter:%d\n", fold_ramp_iter);
   // printf("maxCoeff      :%f\n", (initial_jpos - fold_jpos).cwiseAbs().maxCoeff());
@@ -128,8 +131,8 @@ bool FSMState_RecoveryStand::_UpsideDown()
 
 void FSMState_RecoveryStand::run()
 {
-  // std::cout << "flag: " << _flag << ", _state_iter: " << _state_iter
-  //           << ", _motion_start_iter: " << _motion_start_iter << std::endl;
+  std::cout << "flag: " << _flag << ", _state_iter: " << _state_iter
+            << ", _motion_start_iter: " << _motion_start_iter << std::endl;
   _data->low_cmd->zero();
   switch (_flag)
   {
@@ -283,14 +286,14 @@ void FSMState_RecoveryStand::_HeadUp(const int &curr_iter)
       _data->params->joint_kp.data(), _data->params->joint_kp.size()),
       kd_joint(_data->params->joint_kd.data(), _data->params->joint_kd.size());
 
-  DVec<scalar_t> inter_jpos = _SetJPosInterPts(curr_iter, fold_ramp_iter, initial_jpos, fold_jpos);
+  DVec<scalar_t> inter_jpos = _SetJPosInterPts(curr_iter, headup_ramp_iter, initial_jpos, fold_jpos);
   _data->low_cmd->qd = inter_jpos;
   _data->low_cmd->qd_dot.setZero();
   _data->low_cmd->kp.setZero();
   _data->low_cmd->kd.setZero();
   _data->low_cmd->tau_cmd = kp_joint.cwiseProduct(inter_jpos - _data->low_state->q) +
                             kd_joint.cwiseProduct(-_data->low_state->dq);
-  _data->low_cmd->tau_cmd(2) = _data->low_cmd->tau_cmd(5) = 0;
+  // _data->low_cmd->tau_cmd(2) = _data->low_cmd->tau_cmd(5) = 0;
   for (Eigen::Index i(0); i < initial_jpos.size(); ++i)
   {
     bound(_data->low_cmd->tau_cmd(i), _data->params->torque_limit[i]);
@@ -325,8 +328,12 @@ FSMStateName FSMState_RecoveryStand::checkTransition()
     break;
 
   case FSMStateName::RL: // normal c
-    if ((int)(_state_iter - fold_ramp_iter - standup_ramp_iter) >= 100)
+    std::cout << "rl_waiting_for_transition" << std::endl;
+    if ((int)(_state_iter - headup_ramp_iter) >= 100)
+    {
+      std::cout << "rl_transition_ok" << std::endl;
       this->_nextStateName = FSMStateName::RL;
+    }
     break;
   default:
     break;
