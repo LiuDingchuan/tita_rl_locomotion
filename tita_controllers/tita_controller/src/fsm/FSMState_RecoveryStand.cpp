@@ -52,7 +52,7 @@ FSMState_RecoveryStand::FSMState_RecoveryStand(std::shared_ptr<ControlFSMData> d
     stand_jpos << -0.184481302, -1.194677873, 0.0, -0.184481302, -1.194677873, 0.0;
     // Rolling
     rolling_jpos << 0.0f, -0.0f, 0.0f, 0.0f, 0.0f, 0.0f;
-    headup_jpos << -0.19, -1.19, 0.0, -0.19, -1.19, 0.0f;
+    headup_jpos << 0, 0, 0.0, 0, 0, 0.0;
     f_ff << 0.f, -25.f, 0.f, 0.f, -25.f, 0.f;
   }
 }
