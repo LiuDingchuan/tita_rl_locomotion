@@ -12,7 +12,7 @@
  */
 
 FSMState_RL::FSMState_RL(std::shared_ptr<ControlFSMData> data)
-    : FSMState(data, FSMStateName::RL, "idle"),
+    : FSMState(data, FSMStateName::RL, "rl"),
       input_0(new float[n_prio]),
       input_1(new float[n_prio * history_len]),
       output(new float[DOF]),

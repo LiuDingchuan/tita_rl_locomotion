@@ -53,15 +53,15 @@ def generate_launch_description():
             description="Select wheel-legged robot control methods, mcu means on mcu-board control",
         )
     )
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "urdf",
-            default_value="robot.xacro",
-            description="Select urdf file in locomotion_bringup/description/urdf",
-        )
-    )
-    urdf = "robot.xacro"
-    yaml_path = "locomotion_bringup"
+    # declared_arguments.append(
+    #     DeclareLaunchArgument(
+    #         "urdf",
+    #         default_value="robot.xacro",
+    #         description="Select urdf file in locomotion_bringup/description/urdf",
+    #     )
+    # )
+    # urdf = "robot.xacro"
+    # yaml_path = "locomotion_bringup"
     
     hardware_controller_manager_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(
@@ -72,8 +72,8 @@ def generate_launch_description():
         launch_arguments={
             'use_tower': LaunchConfiguration('use_tower'),
             'ctrl_mode': LaunchConfiguration('ctrl_mode'),
-            'urdf': urdf,
-            'yaml_path': yaml_path,
+            'urdf':"robot.xacro",
+            'yaml_path': "locomotion_bringup",
         }.items(),
         condition=IfCondition(
             PythonExpression([
@@ -131,10 +131,10 @@ def generate_launch_description():
 
     return LaunchDescription(declared_arguments + [
         hardware_controller_manager_launch,
-        hw_broadcaster,
-        # joint_state_broadcaster_spawner,
-        # imu_sensor_broadcaster_spawner,
+        # hw_broadcaster,
+        joint_state_broadcaster_spawner,
+        imu_sensor_broadcaster_spawner,
         wbc_controller,
-        effort_controller,
+        # effort_controller,
         robot_inertia_launch,
     ])
