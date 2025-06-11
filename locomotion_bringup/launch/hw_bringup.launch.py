@@ -72,7 +72,7 @@ def generate_launch_description():
         launch_arguments={
             'use_tower': LaunchConfiguration('use_tower'),
             'ctrl_mode': LaunchConfiguration('ctrl_mode'),
-            'urdf':"robot.xacro",
+            'urdf': "robot.xacro",
             'yaml_path': "locomotion_bringup",
         }.items(),
         condition=IfCondition(

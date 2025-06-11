@@ -35,7 +35,7 @@ struct RobotControlParameters
   scalar_t static_friction_coefficient{0.8};
   std::string base_name{"base_link"};
   std::vector<std::string> wheel_joint_name;
-  std::string robot_description{"/usr/share/robot_description/diablo_pluspro/urdf/robot.urdf"};
+  std::string robot_description{"/usr/share/robot_description/diablo_pluspro_stand/urdf/diablo_pluspro_stand.urdf"};
   size_t dof_chassis{6}, dof_arm{6};
 
   // control param

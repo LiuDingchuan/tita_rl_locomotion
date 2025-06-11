@@ -119,6 +119,7 @@ def generate_launch_description():
             robot_controllers,
         ],
         namespace=prefix, 
+        # prefix='gdb -ex run --args',    
     )
     
     robot_state_pub_node = Node(
@@ -130,6 +131,7 @@ def generate_launch_description():
             {"frame_prefix": prefix+"/"},
         ],
         namespace=prefix, 
+        # prefix='gdb -ex run --args',    
     )
 
     joint_state_broadcaster_spawner = Node(

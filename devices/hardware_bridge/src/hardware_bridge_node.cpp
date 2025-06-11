@@ -32,23 +32,13 @@ namespace tita_locomotion
     {
       return hardware_interface::CallbackReturn::ERROR;
     }
-    // node_ = rclcpp::Node::make_shared("hardware_bridge_node");
-    // executor_.add_node(node_);
-    // std::thread([this]() { executor_.spin(); }).detach();
     auto ctrl_mode = info_.hardware_parameters["ctrl_mode"];
+    // direct_mode_ = false, when ctrl_mode == mcu
     direct_mode_ = ctrl_mode.compare("mcu") == 0 ? false : true;
-    // if (direct_mode_)
-    // {
-    //   pid_t pid = getpid();
-    //   sched_param sched;
-    //   sched.sched_priority = sched_get_priority_max(SCHED_FIFO);
-    //   sched_setscheduler(pid, SCHED_RR, &sched);
-    //   if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &sched) != 0)
-    //   {
-    //     std::cerr << "Failed to set current thread's priority." << std::endl;
-    //     return hardware_interface::CallbackReturn::ERROR;
-    //   }
-    // }
+
+    diablo_joint_sdk_ = std::make_shared<SerialHandle>();
+    diablo_joint_sdk_->serial_init("/dev/ttyUSB0");
+    std::cout << "serial init------------------------ " << std::endl;
 
     for (hardware_interface::ComponentInfo component : info.joints)
     {
@@ -155,7 +145,6 @@ namespace tita_locomotion
       joint_vel.push_back(diablo_joint.vel);
       joint_tau.push_back(diablo_joint.torque);
     }
-
     for (size_t id = 0; id < mJoints.size(); id++)
     {
       // data acquire from encoder
@@ -176,10 +165,6 @@ namespace tita_locomotion
           mJoints[id].position += 2 * M_PI;
         }
       }
-      // std::cout << "joint name is " << mJoints[id].name << "joint id is "<< id << std::endl ;
-      // std::cout << "joint_pos   " << id << " "<< mJoints[id].position<< std::endl ;
-      // std::cout << "joint_vel   " << id << " "<< mJoints[id].velocity<< std::endl ;
-      // std::cout << "joint_effot " << id << " "<< mJoints[id].effort<< std::endl ;
     }
     // closed loop model to urdf open loop model
     mJoints[1].position = -mJoints[1].position;
@@ -208,37 +193,6 @@ namespace tita_locomotion
     // std::cout << "orientation " << mImu.orientation[0] << std::endl ;
 
     return hardware_interface::return_type::OK;
-    /*****以下是tita的版本，先注释掉 */
-    // // read from can bus
-    // auto q = robot_->get_joint_q();
-    // auto v = robot_->get_joint_v();
-    // auto t = robot_->get_joint_t();
-    // for (size_t id = 0; id < mJoints.size(); id++)
-    // {
-    //   mJoints[id].position = q[id];
-    //   mJoints[id].velocity = v[id];
-    //   mJoints[id].effort = t[id];
-    //   if (id == 1 || id == 5)
-    //   {
-    //     if (mJoints[id].position < -2.5)
-    //     {
-    //       mJoints[id].position += 2 * M_PI;
-    //     }
-    //   }
-    // }
-    // auto quat = robot_->get_imu_quaternion();
-    // auto accl = robot_->get_imu_acceleration();
-    // auto gyro = robot_->get_imu_angular_velocity();
-
-    // for (size_t id = 0; id < 3; id++)
-    // {
-    //   mImu.linear_acceleration[id] = accl[id];
-    //   mImu.angular_velocity[id] = gyro[id];
-    //   mImu.orientation[id] = quat[id];
-    // }
-
-    // mImu.orientation[3] = quat[3];
-    // return hardware_interface::return_type::OK;
   }
 
   hardware_interface::return_type HardwareBridge::write(
