@@ -2,7 +2,7 @@
  * @Author: hilab-workshop-ldc 2482812356@qq.com
  * @Date: 2025-04-03 22:48:26
  * @LastEditors: hilab-workshop-ldc 2482812356@qq.com
- * @LastEditTime: 2025-04-12 20:22:51
+ * @LastEditTime: 2025-06-10 18:42:48
  * @FilePath: /tita_rl_sim2sim2real/src/tita_locomotion/tita_controllers/tita_controller/include/common/RobotParameters.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -35,7 +35,7 @@ struct RobotControlParameters
   scalar_t static_friction_coefficient{0.8};
   std::string base_name{"base_link"};
   std::vector<std::string> wheel_joint_name;
-  std::string robot_description{"/usr/share/robot_description/diablo_pluspro/urdf/robot.urdf"};
+  std::string robot_description{"/usr/share/robot_description/diablo_pluspro_stand/urdf/diablo_pluspro_stand.urdf"};
   size_t dof_chassis{6}, dof_arm{6};
 
   // control param
