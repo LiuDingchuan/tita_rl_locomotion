@@ -151,31 +151,31 @@ namespace tita_locomotion
       mJoints[id].position = joint_direction_[id] * joint_pos[id] / POS_SCALE - joint_offset_[id];
       mJoints[id].velocity = joint_direction_[id] * joint_vel[id] / VEL_SCALE;
       mJoints[id].effort = joint_direction_[id] * joint_tau[id] / TAU_SCALE;
-      if (id == 0 || id == 3)
-      {
-        if (mJoints[id].position < -4.5)
-        {
-          mJoints[id].position += 2 * M_PI;
-        }
-      }
+      // if (id == 0 || id == 3)
+      // {
+      //   if (mJoints[id].position < -4.5)
+      //   {
+      //     mJoints[id].position += 2 * M_PI;
+      //   }
+      // }
       if (id == 1 || id == 4)
       {
-        if (mJoints[id].position < -1)
+        if (mJoints[id].position < -3)
         {
           mJoints[id].position += 2 * M_PI;
         }
       }
     }
     // closed loop model to urdf open loop model
-    mJoints[1].position = -mJoints[1].position;
-    mJoints[1].velocity = -mJoints[1].velocity;
-    mJoints[4].position = -mJoints[4].position;
-    mJoints[4].velocity = -mJoints[4].velocity;
+    // mJoints[1].position = -mJoints[1].position;
+    // mJoints[1].velocity = -mJoints[1].velocity;
+    // mJoints[4].position = -mJoints[4].position;
+    // mJoints[4].velocity = -mJoints[4].velocity;
 
-    mJoints[0].position = mJoints[0].position - mJoints[1].position;
-    mJoints[0].velocity = mJoints[0].velocity - mJoints[1].velocity;
-    mJoints[3].position = mJoints[3].position - mJoints[4].position;
-    mJoints[3].velocity = mJoints[3].velocity - mJoints[4].velocity;
+    // mJoints[0].position = mJoints[0].position - mJoints[1].position;
+    // mJoints[0].velocity = mJoints[0].velocity - mJoints[1].velocity;
+    // mJoints[3].position = mJoints[3].position - mJoints[4].position;
+    // mJoints[3].velocity = mJoints[3].velocity - mJoints[4].velocity;
 
     mImu.linear_acceleration[0] = diablo_info->accl.x / 1638.5f * 9.81f;
     mImu.linear_acceleration[1] = diablo_info->accl.y / 1638.5f * 9.81f;
@@ -189,9 +189,13 @@ namespace tita_locomotion
     mImu.orientation[1] = diablo_info->orientation.y / 32767.f,
     mImu.orientation[2] = diablo_info->orientation.z / 32767.f,
     mImu.orientation[3] = diablo_info->orientation.w / 32767.f;
-
     // std::cout << "orientation " << mImu.orientation[0] << std::endl ;
-
+    // for (size_t id = 0; id < mJoints.size(); ++id)
+    // {
+    //   std::cout << "joint " << id << " position " << mJoints[id].position
+    //             << " velocity " << mJoints[id].velocity
+    //             << " effort " << mJoints[id].effort << std::endl;
+    // }
     return hardware_interface::return_type::OK;
   }
 
@@ -214,8 +218,8 @@ namespace tita_locomotion
     }
     // std::cout << "effortcommand" <<  << std::endl;
     // urdf open loop model to closed loop model
-    motorCmd[1] = -motorCmd[1];
-    motorCmd[4] = -motorCmd[4];
+    // motorCmd[1] = -motorCmd[1];
+    // motorCmd[4] = -motorCmd[4];
 
     // motorCmd[2] = 0;
     // motorCmd[5] = 0;

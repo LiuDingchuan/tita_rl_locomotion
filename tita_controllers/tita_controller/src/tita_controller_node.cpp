@@ -168,7 +168,7 @@ namespace tita_locomotion
       joints_[id]->effort_command_handle->get().set_value(controlData_->low_cmd->tau_cmd[id]);
       joints_[id]->kp_command_handle->get().set_value(controlData_->low_cmd->kp[id]);
       joints_[id]->kd_command_handle->get().set_value(controlData_->low_cmd->kd[id]);
-    }
+    }  
     wbcTimer_.endTimer();
     // static long int counter = 0;
     // if (counter % 100 == 0) {
@@ -185,7 +185,7 @@ namespace tita_locomotion
     robot_states_cb();
     return controller_interface::return_type::OK;
   }
-
+  // 绑定各个硬件接口
   controller_interface::CallbackReturn TitaController::on_activate(const rclcpp_lifecycle::State &)
   {
     RCLCPP_INFO(get_node()->get_logger(), "on_activate");
@@ -687,6 +687,7 @@ namespace tita_locomotion
     // clang-format on
     RCLCPP_INFO(get_node()->get_logger(), "Parameters were updated");
     std::cout << joints_.size() << " joints were updated" << std::endl;
+    std::cout << "Wheel radius: " << param->wheel_radius << std::endl;
   }
 
   TitaController::~TitaController()
