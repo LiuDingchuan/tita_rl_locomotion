@@ -131,8 +131,8 @@ bool FSMState_RecoveryStand::_UpsideDown()
 
 void FSMState_RecoveryStand::run()
 {
-  std::cout << "flag: " << _flag << ", _state_iter: " << _state_iter
-            << ", _motion_start_iter: " << _motion_start_iter << std::endl;
+  // std::cout << "flag: " << _flag << ", _state_iter: " << _state_iter
+  //           << ", _motion_start_iter: " << _motion_start_iter << std::endl;
   _data->low_cmd->zero();
   switch (_flag)
   {
@@ -285,6 +285,8 @@ void FSMState_RecoveryStand::_HeadUp(const int &curr_iter)
   Eigen::Map<DVec<scalar_t>> kp_joint(
       _data->params->joint_kp.data(), _data->params->joint_kp.size()),
       kd_joint(_data->params->joint_kd.data(), _data->params->joint_kd.size());
+
+  // Output joint_kp and joint_kd values
 
   DVec<scalar_t> inter_jpos = _SetJPosInterPts(curr_iter, headup_ramp_iter, initial_jpos, fold_jpos);
   _data->low_cmd->qd = inter_jpos;

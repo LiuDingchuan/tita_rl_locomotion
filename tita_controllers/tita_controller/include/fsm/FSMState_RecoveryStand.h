@@ -2,7 +2,7 @@
  * @Author: hilab-workshop-ldc 2482812356@qq.com
  * @Date: 2025-03-20 15:25:00
  * @LastEditors: hilab-workshop-ldc 2482812356@qq.com
- * @LastEditTime: 2025-06-09 14:47:52
+ * @LastEditTime: 2025-06-12 19:19:05
  * @FilePath: /tita_rl_sim2sim2real/src/tita_locomotion/tita_controllers/tita_controller/include/fsm/FSMState_RecoveryStand.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -63,7 +63,7 @@ private:
   const float timer_fold = 2.0; // timer unit : second
   const float timer_standup = 1.0;
   const float timer_rollover = 1.0;
-  const float timer_headup = 1.0;
+  const float timer_headup = 2.0;
   int fold_ramp_iter, rollover_ramp_iter, standup_ramp_iter, headup_ramp_iter;
 
   void _RollOver(const int &iter);
