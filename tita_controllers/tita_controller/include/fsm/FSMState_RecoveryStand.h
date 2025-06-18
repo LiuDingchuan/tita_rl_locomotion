@@ -63,7 +63,7 @@ private:
   const float timer_fold = 2.0; // timer unit : second
   const float timer_standup = 1.0;
   const float timer_rollover = 1.0;
-  const float timer_headup = 1.0;
+  const float timer_headup = 2.0;
   int fold_ramp_iter, rollover_ramp_iter, standup_ramp_iter, headup_ramp_iter;
 
   void _RollOver(const int &iter);

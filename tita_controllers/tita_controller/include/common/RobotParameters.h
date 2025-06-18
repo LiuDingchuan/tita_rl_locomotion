@@ -25,7 +25,7 @@ struct RobotControlParameters
 {
   RobotControlParameters()
   {
-    torque_limit = {80.0, 80.0, 20.0, 80.0, 80.0, 20.0};
+    torque_limit = {60.0, 60.0, 20.0, 60.0, 60.0, 20.0};
     joint_kp = {40.0, 40.0, 10.0, 40.0, 40.0, 1.0};
     joint_kd = {1.0, 1.0, 0.5, 1.0, 1.0, 0.5};
     wheel_joint_name = {"left_wheel_joint", "right_wheel_joint"};

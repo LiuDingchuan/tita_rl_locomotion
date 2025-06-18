@@ -151,10 +151,12 @@ void FSMState_RL::run()
   {
     if (i % (DOF / 2) == (DOF / 2 - 1)) // 轮子
     {
+      _data->low_cmd->qd_dot[i] = 20 * desired_pos[i];
       _data->low_cmd->tau_cmd[i] = 10 * desired_pos[i] - 0.5 * _data->low_state->dq[i];
     }
     else // 关节？
     {
+      _data->low_cmd->qd[i] = desired_pos[i];
       _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 1.0 * (0 - _data->low_state->dq[i]);
     }
   }

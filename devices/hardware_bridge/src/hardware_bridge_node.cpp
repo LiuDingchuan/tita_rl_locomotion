@@ -62,7 +62,15 @@ namespace tita_locomotion
     // }
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
-
+  /**
+   * @brief: 这里是通过ROS2的SystemInterface接口导出状态接口和命令接口
+   *         这些接口会被控制器使用来获取关节状态和发送命令
+   *         这里的状态接口包括关节位置、速度、力矩等信息
+   *          主要是通过将地址导出的方式进行的
+   * @author: Dandelion
+   * @Date: 2025-06-16 18:19:29
+   * @return {*}
+   */
   std::vector<hardware_interface::StateInterface> HardwareBridge::export_state_interfaces()
   {
     std::vector<hardware_interface::StateInterface> interfaces;
@@ -210,10 +218,9 @@ namespace tita_locomotion
       for (size_t id = 0; id < 6; id++)
       {
         // motorCmd[id] = static_cast<float>(mJoints[id].effortCommand +
-        //                                 mJoints[id].kp * (mJoints[id].positionCommand - mJoints[id].position) +
-        //                                 mJoints[id].kd * (mJoints[id].velocityCommand - mJoints[id].velocity));
+        //                                   mJoints[id].kp * (mJoints[id].positionCommand - mJoints[id].position) +
+        //                                   mJoints[id].kd * (mJoints[id].velocityCommand - mJoints[id].velocity));
         motorCmd[id] = static_cast<float>(mJoints[id].effortCommand);
-        // std::cout << "motor cmd "<< id << " " <<motorCmd[id] << std::endl ;
       }
     }
     // std::cout << "effortcommand" <<  << std::endl;
