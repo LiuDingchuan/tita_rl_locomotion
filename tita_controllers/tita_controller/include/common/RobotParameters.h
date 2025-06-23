@@ -1,8 +1,8 @@
 /*
  * @Author: hilab-workshop-ldc 2482812356@qq.com
  * @Date: 2025-04-03 22:48:26
- * @LastEditors: hilab-workshop-ldc 2482812356@qq.com
- * @LastEditTime: 2025-04-12 20:22:51
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2025-06-23 17:03:59
  * @FilePath: /tita_rl_sim2sim2real/src/tita_locomotion/tita_controllers/tita_controller/include/common/RobotParameters.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */

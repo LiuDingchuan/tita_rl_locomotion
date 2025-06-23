@@ -78,6 +78,7 @@ private:
   int history_len = 10;
   int n_priv_latent = 30;
   int temp_history_len_all = 270 - 27;
+  bool use_filter = false;
 
   float yaw_vel_cmd_;
 
@@ -110,7 +111,8 @@ private:
   void _GetObs();
   Vec3<double> a_l;
 
-  float action[DOF];
+  float action[DOF] = {0};
+  float last_action[DOF] = {0};
 
   bool stop_update_ = false;
   bool thread_first_ = true;

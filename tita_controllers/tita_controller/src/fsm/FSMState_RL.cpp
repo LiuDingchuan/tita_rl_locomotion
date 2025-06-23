@@ -19,7 +19,7 @@ FSMState_RL::FSMState_RL(std::shared_ptr<ControlFSMData> data)
       output_last(new float[DOF]),
       input_1_temp(new float[temp_history_len_all])
 {
-  cuda_test_ = std::make_shared<CudaTest>("/home/wex/rl_model/model_gn.engine");
+  cuda_test_ = std::make_shared<CudaTest>("/home/wex/rl_model/model_gn_add_lag.engine");
   std::cout << "cuda init :" << cuda_test_->get_cuda_init() << std::endl;
 }
 
@@ -298,10 +298,23 @@ void FSMState_RL::_Run_Forward()
 
       for (int j = 0; j < DOF; j++)
       {
-        action[j] = output.get()[j] * params_.action_scale + params_.default_dof_pos[j];
+        if (use_filter)
+        {
+          action[j] = 0.8 * output.get()[j] + 0.2 * last_action[j];
+          last_action[j] = output.get()[j];
+          if (j % 3 == 0)
+            action[j] = action[j] * params_.action_scale * params_.hip_scale_reduction + params_.default_dof_pos[j];
+          else
+            action[j] = action[j] * params_.action_scale + params_.default_dof_pos[j];
+        }
+        else
+        {
+          if (j % 3 == 0) // hip关节
+            action[j] = output.get()[j] * params_.action_scale * params_.hip_scale_reduction + params_.default_dof_pos[j];
+          else //
+            action[j] = output.get()[j] * params_.action_scale + params_.default_dof_pos[j];
+        }
       }
-      action[0] *= params_.hip_scale_reduction;
-      action[3] *= params_.hip_scale_reduction;
       // action[DOF / 2 - 1] = output.get()[DOF / 2 - 1] * params_.action_scale_vel;
       // action[DOF - 1] = output.get()[DOF - 1] * params_.action_scale_vel;
       // 换位？左腿换右腿(因为RL里面是反的)
