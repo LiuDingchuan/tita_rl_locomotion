@@ -647,8 +647,7 @@ namespace tita_locomotion
 
   // get_node()->get_parameter<std::vector<scalar_t>>("wbc_joint_pd.p", param->wbc_joint_kp);
   // get_node()->get_parameter<std::vector<scalar_t>>("wbc_joint_pd.d", param->wbc_joint_kd);
-  int DOF_one_leg = joints_.size()/2;
-  scalar_t kp[DOF_one_leg], kd[DOF_one_leg];
+  scalar_t kp[4], kd[4];
   get_node()->get_parameter<scalar_t>("single_joint_pd1.p", kp[0]);
   get_node()->get_parameter<scalar_t>("single_joint_pd1.d", kd[0]);
   get_node()->get_parameter<scalar_t>("single_joint_pd2.p", kp[1]);
@@ -657,13 +656,13 @@ namespace tita_locomotion
   get_node()->get_parameter<scalar_t>("single_joint_pd3.d", kd[2]);
   // get_node()->get_parameter<scalar_t>("single_joint_pd4.p", kp[3]);
   // get_node()->get_parameter<scalar_t>("single_joint_pd4.d", kd[3]);
-  param->wbc_joint_kp.resize(DOF_one_leg);
-  param->wbc_joint_kd.resize(DOF_one_leg);
-  for(int i = 0; i < DOF_one_leg; ++i) {
+  param->wbc_joint_kp.resize(8);
+  param->wbc_joint_kd.resize(8);
+  for(int i = 0; i < 4; ++i) {
     param->wbc_joint_kp[i] = kp[i];
-    param->wbc_joint_kp[i+DOF_one_leg] = kp[i];
+    param->wbc_joint_kp[i+4] = kp[i];
     param->wbc_joint_kd[i] = kd[i];
-    param->wbc_joint_kd[i+DOF_one_leg] = kd[i];
+    param->wbc_joint_kd[i+4] = kd[i];
   }
 
   get_node()->get_parameter<std::vector<scalar_t>>("arm_joint_kp", param->arm_joint_kp_);

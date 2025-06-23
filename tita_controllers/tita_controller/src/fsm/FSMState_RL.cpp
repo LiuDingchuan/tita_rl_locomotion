@@ -26,7 +26,6 @@ FSMState_RL::FSMState_RL(std::shared_ptr<ControlFSMData> data)
 void FSMState_RL::enter()
 {
   _data->state_command->firstRun = true;
-
   if (DOF / 2 == 4)
   {
     for (int i = 0; i < 2; i++)
@@ -151,10 +150,12 @@ void FSMState_RL::run()
   {
     if (i % (DOF / 2) == (DOF / 2 - 1)) // 轮子
     {
+      _data->low_cmd->qd_dot[i] = 20 * desired_pos[i];
       _data->low_cmd->tau_cmd[i] = 10 * desired_pos[i] - 0.5 * _data->low_state->dq[i];
     }
-    else // 关节？
+    else // 关节
     {
+      _data->low_cmd->qd[i] = desired_pos[i];
       _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 1.0 * (0 - _data->low_state->dq[i]);
     }
   }
@@ -293,10 +294,11 @@ void FSMState_RL::_Run_Forward()
       obs_.dof_pos[DOF - 1] = 0;
 
       _Forward();
-
       for (int j = 0; j < DOF; j++)
       {
-        action[j] = output.get()[j] * params_.action_scale + params_.default_dof_pos[j];
+        action[j] = 0.8 * output.get()[j] + 0.2 * last_action[j];
+        last_action[j] = output.get()[j];
+        action[j] = action[j] * params_.action_scale + params_.default_dof_pos[j];
       }
       action[0] *= params_.hip_scale_reduction;
       action[3] *= params_.hip_scale_reduction;

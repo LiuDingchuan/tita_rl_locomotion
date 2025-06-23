@@ -110,8 +110,10 @@ private:
   void _GetObs();
   Vec3<double> a_l;
 
-  float action[DOF];
+  float action[DOF] = {0};
+  float last_action[DOF] = {0};
 
+  int update_stamp = 0;
   bool stop_update_ = false;
   bool thread_first_ = true;
 };
