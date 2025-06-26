@@ -145,6 +145,7 @@ namespace tita_locomotion
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
     auto diablo_info = diablo_joint_sdk_->rec_package;
+    // std::cout << "read_cnt: " << diablo_info->frame_cnt << std::endl;
     auto diablo_joints = std::vector<motor_msgs_t>{diablo_info->left_hip, diablo_info->left_knee, diablo_info->left_wheel, diablo_info->right_hip, diablo_info->right_knee, diablo_info->right_wheel};
     std::vector<double> joint_pos, joint_vel, joint_tau;
     for (const auto &diablo_joint : diablo_joints)

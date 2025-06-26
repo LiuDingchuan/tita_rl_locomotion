@@ -53,6 +53,7 @@ namespace VulcanSerial {
             B_115200,
             B_230400,
             B_460800,
+            B_921600,
             B_CUSTOM, // Placeholder
         };
 
@@ -141,7 +142,7 @@ namespace VulcanSerial {
             std::vector<char> readBuffer_;
             unsigned char readBufferSize_B_;
 
-            static constexpr BaudRate defaultBaudRate_ = BaudRate::B_460800;
+            static constexpr BaudRate defaultBaudRate_ = BaudRate::B_921600;
             static constexpr int32_t defaultTimeout_ms_ = -1;
             static constexpr unsigned char defaultReadBufferSize_B_ = 255;
 

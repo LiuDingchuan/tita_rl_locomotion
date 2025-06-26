@@ -12,7 +12,7 @@ void SerialHandle::serial_init(const std::string dev)
 {
     rec_package = std::shared_ptr<uart_packet_t>((uart_packet_t *)(rec_buffer));
     mySerial.SetDevice(dev.c_str());
-    mySerial.SetBaudRate(VulcanSerial::BaudRate::B_460800);
+    mySerial.SetBaudRate(VulcanSerial::BaudRate::B_921600);
     mySerial.SetNumDataBits(VulcanSerial::NumDataBits::EIGHT);
     mySerial.SetNumStopBits(VulcanSerial::NumStopBits::ONE);
     mySerial.Open();
@@ -25,7 +25,7 @@ uint32_t frame_in_cnt = 0;
 uint8_t receive_test = 0;
 void SerialHandle::serial_recive(void)
 {
-    uint32_t byte_micro = 1000000 * 10 / 460800;
+    uint32_t byte_micro = 1000000 * 25 / 921600;
 
     while (rec_loop)
     {

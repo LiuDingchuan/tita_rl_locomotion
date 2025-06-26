@@ -307,6 +307,10 @@ namespace VulcanSerial
 				tty.c_ispeed = 460800;
 				tty.c_ospeed = 460800;
 				break;
+			case BaudRate::B_921600:
+				tty.c_ispeed = 921600;
+				tty.c_ospeed = 921600;
+				break;
 			default:
 				throw std::runtime_error(std::string() + "baudRate passed to " + __PRETTY_FUNCTION__ + " unrecognized.");
 			}
