@@ -126,8 +126,6 @@ namespace tita_locomotion
       params_ = param_listener_->get_params();
       update_control_parameters();
     }
-    controlData_->params->dt = period.seconds();
-
     wbcTimer_.startTimer();
     // State Update
     int id = 0;
