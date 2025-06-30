@@ -16,6 +16,8 @@
 
 #include <pthread.h>
 #include <sched.h>
+#include <chrono>
+#include <iostream>
 
 #include "pluginlib/class_list_macros.hpp"
 
@@ -144,67 +146,69 @@ namespace tita_locomotion
   hardware_interface::return_type HardwareBridge::read(
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
-    auto diablo_info = diablo_joint_sdk_->rec_package;
-    // std::cout << "read_cnt: " << diablo_info->frame_cnt << std::endl;
-    auto diablo_joints = std::vector<motor_msgs_t>{diablo_info->left_hip, diablo_info->left_knee, diablo_info->left_wheel, diablo_info->right_hip, diablo_info->right_knee, diablo_info->right_wheel};
-    std::vector<double> joint_pos, joint_vel, joint_tau;
-    for (const auto &diablo_joint : diablo_joints)
+    static uint16_t last_receive_cnt = 0; // 上一次接收到的包计数
+    uart_packet_t lastest_buffer;
+    diablo_joint_sdk_->get_latest_packet(lastest_buffer);
+    auto diablo_info = &lastest_buffer;
+    if (diablo_info->frame_cnt != last_receive_cnt)
     {
-      joint_pos.push_back(diablo_joint.pos);
-      joint_vel.push_back(diablo_joint.vel);
-      joint_tau.push_back(diablo_joint.torque);
-    }
-    for (size_t id = 0; id < mJoints.size(); id++)
-    {
-      // data acquire from encoder
-      mJoints[id].position = joint_direction_[id] * joint_pos[id] / POS_SCALE - joint_offset_[id];
-      mJoints[id].velocity = joint_direction_[id] * joint_vel[id] / VEL_SCALE;
-      mJoints[id].effort = joint_direction_[id] * joint_tau[id] / TAU_SCALE;
-      // if (id == 0 || id == 3)
-      // {
-      //   if (mJoints[id].position < -4.5)
-      //   {
-      //     mJoints[id].position += 2 * M_PI;
-      //   }
-      // }
-      if (id == 1 || id == 4)
+      // static std::chrono::steady_clock::time_point last_time = std::chrono::steady_clock::now();
+      // auto now = std::chrono::steady_clock::now();
+      // auto duration = std::chrono::duration_cast<std::chrono::microseconds>(now - last_time).count();
+      // std::cout << "Time since last packet: " << duration << " us " << " read_cnt: " << diablo_info->frame_cnt << std::endl;
+      // last_time = now;
+
+      last_receive_cnt = diablo_info->frame_cnt;
+      auto diablo_joints = std::vector<motor_msgs_t>{diablo_info->left_hip, diablo_info->left_knee, diablo_info->left_wheel, diablo_info->right_hip, diablo_info->right_knee, diablo_info->right_wheel};
+      std::vector<double> joint_pos, joint_vel, joint_tau;
+      for (const auto &diablo_joint : diablo_joints)
       {
-        if (mJoints[id].position < -3)
+        joint_pos.push_back(diablo_joint.pos);
+        joint_vel.push_back(diablo_joint.vel);
+        joint_tau.push_back(diablo_joint.torque);
+      }
+      for (size_t id = 0; id < mJoints.size(); id++)
+      {
+        // data acquire from encoder
+        mJoints[id].position = joint_direction_[id] * joint_pos[id] / POS_SCALE - joint_offset_[id];
+        mJoints[id].velocity = joint_direction_[id] * joint_vel[id] / VEL_SCALE;
+        mJoints[id].effort = joint_direction_[id] * joint_tau[id] / TAU_SCALE;
+        if (id == 1 || id == 4)
         {
-          mJoints[id].position += 2 * M_PI;
+          if (mJoints[id].position < -3)
+          {
+            mJoints[id].position += 2 * M_PI;
+          }
         }
       }
+      // closed loop model to urdf open loop model
+      // mJoints[1].position = -mJoints[1].position;
+      // mJoints[1].velocity = -mJoints[1].velocity;
+      // mJoints[4].position = -mJoints[4].position;
+      // mJoints[4].velocity = -mJoints[4].velocity;
+
+      // mJoints[0].position = mJoints[0].position - mJoints[1].position;
+      // mJoints[0].velocity = mJoints[0].velocity - mJoints[1].velocity;
+      // mJoints[3].position = mJoints[3].position - mJoints[4].position;
+      // mJoints[3].velocity = mJoints[3].velocity - mJoints[4].velocity;
+
+      mImu.linear_acceleration[0] = diablo_info->accl.x / 1638.5f * 9.81f;
+      mImu.linear_acceleration[1] = diablo_info->accl.y / 1638.5f * 9.81f;
+      mImu.linear_acceleration[2] = diablo_info->accl.z / 1638.5f * 9.81f;
+
+      mImu.angular_velocity[0] = diablo_info->gyro.x / 327.67f;
+      mImu.angular_velocity[1] = diablo_info->gyro.y / 327.67f;
+      mImu.angular_velocity[2] = diablo_info->gyro.z / 327.67f;
+
+      mImu.orientation[0] = diablo_info->orientation.x / 32767.f;
+      mImu.orientation[1] = diablo_info->orientation.y / 32767.f,
+      mImu.orientation[2] = diablo_info->orientation.z / 32767.f,
+      mImu.orientation[3] = diablo_info->orientation.w / 32767.f;
     }
-    // closed loop model to urdf open loop model
-    // mJoints[1].position = -mJoints[1].position;
-    // mJoints[1].velocity = -mJoints[1].velocity;
-    // mJoints[4].position = -mJoints[4].position;
-    // mJoints[4].velocity = -mJoints[4].velocity;
-
-    // mJoints[0].position = mJoints[0].position - mJoints[1].position;
-    // mJoints[0].velocity = mJoints[0].velocity - mJoints[1].velocity;
-    // mJoints[3].position = mJoints[3].position - mJoints[4].position;
-    // mJoints[3].velocity = mJoints[3].velocity - mJoints[4].velocity;
-
-    mImu.linear_acceleration[0] = diablo_info->accl.x / 1638.5f * 9.81f;
-    mImu.linear_acceleration[1] = diablo_info->accl.y / 1638.5f * 9.81f;
-    mImu.linear_acceleration[2] = diablo_info->accl.z / 1638.5f * 9.81f;
-
-    mImu.angular_velocity[0] = diablo_info->gyro.x / 327.67f;
-    mImu.angular_velocity[1] = diablo_info->gyro.y / 327.67f;
-    mImu.angular_velocity[2] = diablo_info->gyro.z / 327.67f;
-
-    mImu.orientation[0] = diablo_info->orientation.x / 32767.f;
-    mImu.orientation[1] = diablo_info->orientation.y / 32767.f,
-    mImu.orientation[2] = diablo_info->orientation.z / 32767.f,
-    mImu.orientation[3] = diablo_info->orientation.w / 32767.f;
-    // std::cout << "orientation " << mImu.orientation[0] << std::endl ;
-    // for (size_t id = 0; id < mJoints.size(); ++id)
-    // {
-    //   std::cout << "joint " << id << " position " << mJoints[id].position
-    //             << " velocity " << mJoints[id].velocity
-    //             << " effort " << mJoints[id].effort << std::endl;
-    // }
+    else
+    {
+      return hardware_interface::return_type::OK;
+    }
     return hardware_interface::return_type::OK;
   }
 

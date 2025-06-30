@@ -12,7 +12,7 @@ void SerialHandle::serial_init(const std::string dev)
 {
     rec_package = std::shared_ptr<uart_packet_t>((uart_packet_t *)(rec_buffer));
     mySerial.SetDevice(dev.c_str());
-    mySerial.SetBaudRate(VulcanSerial::BaudRate::B_921600);
+    mySerial.SetBaudRate(VulcanSerial::BaudRate::B_460800);
     mySerial.SetNumDataBits(VulcanSerial::NumDataBits::EIGHT);
     mySerial.SetNumStopBits(VulcanSerial::NumStopBits::ONE);
     mySerial.Open();
@@ -25,7 +25,7 @@ uint32_t frame_in_cnt = 0;
 uint8_t receive_test = 0;
 void SerialHandle::serial_recive(void)
 {
-    uint32_t byte_micro = 1000000 * 25 / 921600;
+    uint32_t byte_micro = 1000000 * 10 / 460800;
 
     while (rec_loop)
     {
@@ -70,10 +70,22 @@ void SerialHandle::serial_recive(void)
             std::cout << ((uart_packet_t *)(rec_buffer))->left_knee.pos / 5215.03f << std::endl;
             continue;
         }
-        // receive_test ++ ;
-        // receive_cnt ++ ;
-        // std::cout << "send receive_test "<< receive_cnt << std::endl ;
-        memcpy(rec_buffer, test_rec_buffer, sizeof(test_rec_buffer));
+        else
+        {
+            // static std::chrono::steady_clock::time_point last_time = std::chrono::steady_clock::now();
+            // auto now = std::chrono::steady_clock::now();
+            // auto duration = std::chrono::duration_cast<std::chrono::microseconds>(now - last_time).count();
+            // std::cout << "Time since last packet: " << duration << " us ";
+            // last_time = now;
+
+            memcpy(rec_buffer[write_idx], test_rec_buffer, sizeof(uart_packet_t));
+            std::lock_guard<std::mutex> lock(this->swap_mutex);
+            std::swap(write_idx, read_idx);
+            auto info = (uart_packet_t *)(rec_buffer[read_idx]);
+            std::cout << "receive cnt " << info->frame_cnt << std::endl;
+            // receive_cnt++;
+        }
+        // std::cout << "send receive_test " << receive_cnt << std::endl;
     }
 }
 
@@ -140,4 +152,10 @@ void SerialHandle::start_joint_sdk(void)
     }
 
     // if(send_cnt > 10000) send_cnt=0;
+}
+
+void SerialHandle::get_latest_packet(uart_packet_t &package)
+{
+    std::lock_guard<std::mutex> lock(swap_mutex);
+    memcpy(&package, rec_buffer[read_idx], sizeof(uart_packet_t));
 }
