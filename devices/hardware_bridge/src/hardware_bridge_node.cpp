@@ -39,7 +39,7 @@ namespace tita_locomotion
     direct_mode_ = ctrl_mode.compare("mcu") == 0 ? false : true;
 
     diablo_joint_sdk_ = std::make_shared<SerialHandle>();
-    diablo_joint_sdk_->serial_init("/dev/ttyUSB0");
+    diablo_joint_sdk_->serial_init("/dev/ttyTHS1");
     std::cout << "serial init------------------------ " << std::endl;
 
     for (hardware_interface::ComponentInfo component : info.joints)

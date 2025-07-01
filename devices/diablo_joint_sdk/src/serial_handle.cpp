@@ -81,8 +81,8 @@ void SerialHandle::serial_recive(void)
             memcpy(rec_buffer[write_idx], test_rec_buffer, sizeof(uart_packet_t));
             std::lock_guard<std::mutex> lock(this->swap_mutex);
             std::swap(write_idx, read_idx);
-            auto info = (uart_packet_t *)(rec_buffer[read_idx]);
-            std::cout << "receive cnt " << info->frame_cnt << std::endl;
+            // auto info = (uart_packet_t *)(rec_buffer[read_idx]);
+            // std::cout << "receive cnt " << info->frame_cnt << std::endl;
             // receive_cnt++;
         }
         // std::cout << "send receive_test " << receive_cnt << std::endl;

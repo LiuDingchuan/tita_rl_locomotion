@@ -19,7 +19,7 @@ FSMState_RL::FSMState_RL(std::shared_ptr<ControlFSMData> data)
       output_last(new float[DOF]),
       input_1_temp(new float[temp_history_len_all])
 {
-  cuda_test_ = std::make_shared<CudaTest>("/home/wex/rl_model/model_gn1.engine");
+  cuda_test_ = std::make_shared<CudaTest>("/home/wex/rl_model/model_gn.engine");
   std::cout << "cuda init :" << cuda_test_->get_cuda_init() << std::endl;
 }
 
