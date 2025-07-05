@@ -38,7 +38,7 @@
         xyz="0.017899 -0.019179 0.16091"
         rpy="0 0 0" />
       <mass
-        value="8.53" />
+        value="11.47" />
       <inertia
         ixx="0.8371974"
         ixy="-0.06254957"
@@ -106,12 +106,12 @@
       <mass
         value="5.1" />
       <inertia
-        ixx="0.01137421"
-        ixy="0.00070511460"
-        ixz="0.00124554"
-        iyy="0.0082006541"
-        iyz="0.0029798900"
-        izz="0.0060506903" />
+        ixx="0.052637715"
+        ixy="0.0038396366"
+        ixz="0.0029020553"
+        iyy="0.018328965"
+        iyz="0.0038831563"
+        izz="0.051893499" />
     </inertial>
     <visual>
       <origin
@@ -149,6 +149,7 @@
       link="left_hip_link" />
     <axis
       xyz="0 1 0" />
+    <dynamics damping="1.0" friction="0.0" />
     <limit
       lower="-1.57"
       upper="1.57"
@@ -162,14 +163,14 @@
         xyz="0.058585 -0.0059746 -0.081982"
         rpy="0 0 0" />
       <mass
-        value="2.17" />
+        value="0.42" />
       <inertia
-        ixx="0.0044665319"
-        ixy="1.2345077E-05"
-        ixz="-0.00023975799"
-        iyy="0.0046256777"
-        iyz="-0.00022848392"
-        izz="0.0002702575" />
+        ixx="0.0041242120"
+        ixy="-0.00023141797"
+        ixz="-0.0031190064"
+        iyy="0.0068629562"
+        iyz="0.00028573503"
+        izz="0.0028355928" />
     </inertial>
     <visual>
       <origin
@@ -207,6 +208,7 @@
       link="left_knee_link" />
     <axis
       xyz="0 1 0" />
+    <dynamics damping="1.0" friction="0.0" />
     <limit
       lower="-1.19"
       upper="0"
@@ -278,12 +280,12 @@
       <mass
         value="5.1" />
       <inertia
-        ixx="0.01137421"
-        ixy="0.00070511460"
-        ixz="0.00124554"
-        iyy="0.0082006541"
-        iyz="0.0029798900"
-        izz="0.0060506903" />
+        ixx="0.052637715"
+        ixy="0.0038396366"
+        ixz="0.0029020553"
+        iyy="0.018328965"
+        iyz="0.0038831563"
+        izz="0.051893499" />
     </inertial>
     <visual>
       <origin
@@ -321,6 +323,7 @@
       link="right_hip_link" />
     <axis
       xyz="0 1 0" />
+    <dynamics damping="1.0" friction="0.0" />
     <limit
       lower="-1.57"
       upper="1.57"
@@ -334,14 +337,14 @@
         xyz="0.060903 -0.0019333 -0.083431"
         rpy="0 0 0" />
       <mass
-        value="2.17" />
+        value="0.42" />
       <inertia
-        ixx="0.0044665319"
-        ixy="1.2345077E-05"
-        ixz="-0.00023975799"
-        iyy="0.0046256777"
-        iyz="-0.00022848392"
-        izz="0.0002702575" />
+        ixx="0.0041242120"
+        ixy="-0.00023141797"
+        ixz="-0.0031190064"
+        iyy="0.0068629562"
+        iyz="0.00028573503"
+        izz="0.0028355928" />
     </inertial>
     <visual>
       <origin
@@ -379,6 +382,7 @@
       link="right_knee_link" />
     <axis
       xyz="0 1 0" />
+    <dynamics damping="1.0" friction="0.0" />
     <limit
       lower="-1.19"
       upper="0"

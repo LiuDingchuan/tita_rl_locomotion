@@ -19,7 +19,7 @@ FSMState_RL::FSMState_RL(std::shared_ptr<ControlFSMData> data)
       output_last(new float[DOF]),
       input_1_temp(new float[temp_history_len_all])
 {
-  cuda_test_ = std::make_shared<CudaTest>("/home/wex/rl_model/model_gn.engine");
+  cuda_test_ = std::make_shared<CudaTest>("/home/wex/rl_model/model_gn_plane.engine");
   std::cout << "cuda init :" << cuda_test_->get_cuda_init() << std::endl;
 }
 
@@ -66,6 +66,8 @@ void FSMState_RL::enter()
   {
     std::cout << "dof not init!!!!ERROR!!!!! :" << std::endl;
   }
+  obs_.dof_pos[DOF / 2 - 1] = 0;
+  obs_.dof_pos[DOF - 1] = 0;
 
   params_.action_scale = 0.5;
   params_.action_scale_vel = 10.0;
@@ -134,9 +136,15 @@ void FSMState_RL::enter()
   }
   stop_update_ = false;
 }
-
+/**
+ * @brief: 在这里把pos用pd计算成tau
+ * @author: Dandelion
+ * @Date: 2025-07-04 22:53:22
+ * @return {*}
+ */
 void FSMState_RL::run()
 {
+  static bool bad_rl_error = false;
   // _data->state_command->clear();
   // _data->low_cmd->zero();
   x_vel_cmd_ = _data->state_command->rc_data_->twist_linear[point::X];
@@ -158,6 +166,20 @@ void FSMState_RL::run()
     {
       _data->low_cmd->qd[i] = desired_pos[i];
       _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 1.0 * (0 - _data->low_state->dq[i]);
+      if (desired_pos[i] > 1000) // 防止抽风，保护一下
+      {
+        bad_rl_error = true;
+      }
+    }
+  }
+  if (bad_rl_error)
+  {
+    std::cout << "BAD RL ERROR!!!!!! reset desired_pos" << std::endl;
+    for (int i = 0; i < DOF; i++)
+    {
+      desired_pos[i] = _data->low_state->q[i];
+      _data->low_cmd->qd[i] = desired_pos[i];
+      _data->low_cmd->tau_cmd[i] = 0;
     }
   }
 }

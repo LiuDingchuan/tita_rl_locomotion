@@ -39,7 +39,7 @@ namespace tita_locomotion
     direct_mode_ = ctrl_mode.compare("mcu") == 0 ? false : true;
 
     diablo_joint_sdk_ = std::make_shared<SerialHandle>();
-    diablo_joint_sdk_->serial_init("/dev/ttyTHS1");
+    diablo_joint_sdk_->serial_init("/dev/ttyTHS2");
     std::cout << "serial init------------------------ " << std::endl;
 
     for (hardware_interface::ComponentInfo component : info.joints)
@@ -204,10 +204,6 @@ namespace tita_locomotion
       mImu.orientation[1] = diablo_info->orientation.y / 32767.f,
       mImu.orientation[2] = diablo_info->orientation.z / 32767.f,
       mImu.orientation[3] = diablo_info->orientation.w / 32767.f;
-    }
-    else
-    {
-      return hardware_interface::return_type::OK;
     }
     return hardware_interface::return_type::OK;
   }

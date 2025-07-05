@@ -490,9 +490,8 @@ tita_controller:
   joint_pd:
     p: {
       type: double_array,
-      default_value: [40.0, 40.0, 10.0, 40.0, 40.0, 1.0],
+      default_value: [40.0, 40.0, 10.0, 40.0, 40.0, 10.0],
       description: "p for pid.",
-      
       validation: {
         fixed_size<>: [6],
       }
@@ -509,7 +508,7 @@ tita_controller:
   wbc_joint_pd:
     p: {
       type: double_array,
-      default_value: [80.0, 80.0, 15.0, 80.0, 80.0, 15.0],
+      default_value: [40.0, 40.0, 10.0, 40.0, 40.0, 10.0],
       description: "p for pid",
       validation: {
         fixed_size<>: [6],

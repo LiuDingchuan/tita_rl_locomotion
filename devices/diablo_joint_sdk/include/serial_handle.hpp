@@ -36,7 +36,7 @@ public:
 public:
     uint16_t receive_cnt = 0;
     void send_commond(const motor_torque_t &ctrl_package);
-    void serial_init(const std::string dev = "/dev/ttyTHS1");
+    void serial_init(const std::string dev = "/dev/ttyTHS2");
     void create_package(_Float32 *motor_tor, motor_torque_t &motor_package);
     void start_joint_sdk(void);
     void get_latest_packet(uart_packet_t &package);
