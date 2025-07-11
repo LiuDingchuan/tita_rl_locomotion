@@ -78,7 +78,7 @@ private:
   int history_len = 10;
   int n_priv_latent = 30;
   int temp_history_len_all = 270 - 27;
-  bool use_filter = false;
+  bool use_filter = true;
 
   float yaw_vel_cmd_;
 

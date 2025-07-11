@@ -52,7 +52,12 @@
       <inertial>
         <origin xyz="-0.028034 0.083955 -0.03225" rpy="0 0 0" />
         <mass value="5.1" />
-        <inertia ixx="0.01137421" ixy="0.00070511460" ixz="0.00124554" iyy="0.0082006541" iyz="0.0029798900" izz="0.0060506903" />
+        <inertia         ixx="0.052637715"
+        ixy="0.0038396366"
+        ixz="0.0029020553"
+        iyy="0.018328965"
+        iyz="0.0038831563"
+        izz="0.051893499" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -73,15 +78,22 @@
       <parent link="base_link" />
       <child link="left_hip_link" />
       <axis xyz="0 1 0" />
-      <limit lower="-1.57" upper="1.57" effort="80" velocity="15" />
+      <dynamics damping="0.6" friction="0.0" />
+      <limit lower="-2.0" upper="2.0" effort="60" velocity="15" />
     </joint>
 
     <link name="left_knee_link">
       <inertial>
         <origin xyz="0.058585 -0.0059746 -0.081982" rpy="0 0 0" />
-        <mass value="2.17" />
-        <inertia ixx="0.0044665319" ixy="1.2345077E-05" ixz="-0.00023975799" iyy="0.0046256777" iyz="-0.00022848392" izz="0.0002702575" />
-      </inertial>
+        <mass value="0.42" />
+        <inertia
+          ixx="0.0041242120"
+          ixy="-0.00023141797"
+          ixz="-0.0031190064"
+          iyy="0.0068629562"
+          iyz="0.00028573503"
+          izz="0.0028355928" />
+        </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
@@ -101,14 +113,21 @@
       <parent link="left_hip_link" />
       <child link="left_knee_link" />
       <axis xyz="0 1 0" />
-      <limit lower="-1.19" upper="0" effort="80" velocity="15" />
+      <dynamics damping="0.6" friction="0.0" />
+      <limit lower="-1.19" upper="0" effort="60" velocity="15" />
     </joint>
 
     <link name="left_wheel_link">
       <inertial>
         <origin xyz="-2.0554E-06 0.028353 3.331E-07" rpy="0 0 0" />
-        <mass value="2" />
-        <inertia ixx="0.013847" ixy="-1.0976E-07" ixz="-3.0619E-09" iyy="0.027351" iyz="8.9065E-09" izz="0.013847" />
+        <mass value="2.785" />
+        <inertia
+          ixx="0.037393423"
+          ixy="3.1796E-07"
+          ixz="0"
+          iyy="0.073815378"
+          iyz="0"
+          izz="0.037393397" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -129,6 +148,7 @@
       <parent link="left_knee_link" />
       <child link="left_wheel_link" />
       <axis xyz="0 1 0" />
+      <dynamics friction="0.01" />
       <limit lower="-6.283185e4" upper="6.283185e4" effort="20" velocity="30" />
     </joint>
 
@@ -136,7 +156,12 @@
       <inertial>
         <origin xyz="-0.028034 -0.083955 -0.032251" rpy="0 0 0" />
         <mass value="5.1" />
-        <inertia ixx="0.01137421" ixy="0.00070511460" ixz="0.00124554" iyy="0.0082006541" iyz="0.0029798900" izz="0.0060506903" />
+        <inertia         ixx="0.052637715"
+        ixy="0.0038396366"
+        ixz="0.0029020553"
+        iyy="0.018328965"
+        iyz="0.0038831563"
+        izz="0.051893499" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -157,15 +182,22 @@
       <parent link="base_link" />
       <child link="right_hip_link" />
       <axis xyz="0 1 0" />
-      <limit lower="-1.57" upper="1.57" effort="80" velocity="15" />
+      <dynamics damping="0.6" friction="0.0" />
+      <limit lower="-2.0" upper="2.0" effort="60" velocity="15" />
     </joint>
 
     <link name="right_knee_link">
       <inertial>
         <origin xyz="0.060903 -0.0019333 -0.083431" rpy="0 0 0" />
-        <mass value="2.17" />
-        <inertia ixx="0.0044665319" ixy="1.2345077E-05" ixz="-0.00023975799" iyy="0.0046256777" iyz="-0.00022848392" izz="0.0002702575" />
-      </inertial>
+        <mass value="0.42" />
+        <inertia
+          ixx="0.0041242120"
+          ixy="-0.00023141797"
+          ixz="-0.0031190064"
+          iyy="0.0068629562"
+          iyz="0.00028573503"
+          izz="0.0028355928" />
+        </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
@@ -185,14 +217,21 @@
       <parent link="right_hip_link" />
       <child link="right_knee_link" />
       <axis xyz="0 1 0" />
-      <limit lower="-1.19" upper="0" effort="80" velocity="15" />
+      <dynamics damping="0.6" friction="0.0" />
+      <limit lower="-1.19" upper="0" effort="60" velocity="15" />
     </joint>
 
     <link name="right_wheel_link">
       <inertial>
         <origin xyz="-2.0311E-06 -0.019153 -4.553E-07" rpy="0 0 0" />
         <mass value="2" />
-        <inertia ixx="0.013847" ixy="1.0863E-07" ixz="3.5235E-09" iyy="0.027351" iyz="1.5231E-08" izz="0.013847" />
+        <inertia
+          ixx="0.037393423"
+          ixy="3.1796E-07"
+          ixz="0"
+          iyy="0.073815378"
+          iyz="0"
+          izz="0.037393397" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -213,6 +252,7 @@
       <parent link="right_knee_link" />
       <child link="right_wheel_link" />
       <axis xyz="0 1 0" />
+      <dynamics friction="0.01" />
       <limit lower="-6.283185e4" upper="6.283185e4" effort="20" velocity="30" />
     </joint>
   </xacro:macro>

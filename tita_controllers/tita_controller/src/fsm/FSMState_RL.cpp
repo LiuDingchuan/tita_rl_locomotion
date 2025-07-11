@@ -19,8 +19,8 @@ FSMState_RL::FSMState_RL(std::shared_ptr<ControlFSMData> data)
       output_last(new float[DOF]),
       input_1_temp(new float[temp_history_len_all])
 {
-  // cuda_test_ = std::make_shared<CudaTest>("/home/hilabldc/tita_rl/logs/diablo_pluspro/exported/policies/model_gn.engine");
-  cuda_test_ = std::make_shared<CudaTest>("/home/hilabldc/Desktop/rl_model_engine/sim2sim_success.engine");
+  cuda_test_ = std::make_shared<CudaTest>("/home/hilabldc/tita_rl/logs/diablo_pluspro/exported/policies/model_gn.engine");
+  // cuda_test_ = std::make_shared<CudaTest>("/home/hilabldc/Desktop/rl_model_engine/sim2sim_success.engine");
   std::cout << "cuda init :" << cuda_test_->get_cuda_init() << std::endl;
 }
 
@@ -161,10 +161,6 @@ void FSMState_RL::run()
       _data->low_cmd->qd[i] = desired_pos[i];
       _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 1.0 * (0 - _data->low_state->dq[i]);
     }
-    if (desired_pos[i] > 100 & _data->low_cmd->tau_cmd[i] > 50)
-    {
-      // std::cout << "action[0] " << action[0] << " " << action[1] << " " << action[2] << " " << action[3] << " " << action[4] << " " << action[5] << std::endl;
-    }
   }
 }
 
@@ -212,8 +208,8 @@ void FSMState_RL::_GetObs()
   Mat3<double> _G2B_RotMat = this->_data->state_estimator->getResult().rBody.transpose();
 
   Vec3<double> base_ang_vel = a_l;
-  a_l = 0.97 * this->_data->state_estimator->getResult().omegaBody + 0.03 * a_l;
-  // a_l = 1.0 * this->_data->state_estimator->getResult().omegaBody;
+  // a_l = 0.97 * this->_data->state_estimator->getResult().omegaBody + 0.03 * a_l;
+  a_l = 1.0 * this->_data->state_estimator->getResult().omegaBody;
   Vec3<double> projected_gravity = _B2G_RotMat * Vec3<double>(0.0, 0.0, -1.0);
   Vec3<double> projected_forward = _G2B_RotMat * Vec3<double>(1.0, 0.0, 0.0);
   // gravity
