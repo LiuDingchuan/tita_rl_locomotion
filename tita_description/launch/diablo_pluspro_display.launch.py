@@ -29,7 +29,7 @@ def generate_launch_description():
             PathJoinSubstitution(
                 [
                     FindPackageShare("tita_description"),
-                    "diablo_pluspro_stand",
+                    "diablo_pluspro",
                     "xacro/display.xacro",
                 ]
             ),
