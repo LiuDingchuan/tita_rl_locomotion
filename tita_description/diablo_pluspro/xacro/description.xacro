@@ -75,7 +75,7 @@
       <parent link="base_link" />
       <child link="left_hip_link" />
       <axis xyz="0 1 0" />
-      <dynamics damping="1.0" friction="0.0" />
+      <dynamics damping="0.0" friction="2.0" />
       <limit lower="-3.14" upper="3.14" effort="60" velocity="15" />
     </joint>
 
@@ -105,7 +105,7 @@
       <parent link="left_hip_link" />
       <child link="left_knee_link" />
       <axis xyz="0 1 0" />
-      <dynamics damping="1.0" friction="0.0" />
+      <dynamics damping="0.0" friction="2.0" />
       <limit lower="-1.19" upper="0" effort="60" velocity="15" />
     </joint>
 
@@ -165,7 +165,7 @@
       <parent link="base_link" />
       <child link="right_hip_link" />
       <axis xyz="0 1 0" />
-      <dynamics damping="1.0" friction="0.0" />
+      <dynamics damping="0.0" friction="2.0" />
       <limit lower="-3.14" upper="3.14" effort="60" velocity="15" />
     </joint>
 
@@ -195,7 +195,7 @@
       <parent link="right_hip_link" />
       <child link="right_knee_link" />
       <axis xyz="0 1 0" />
-      <dynamics damping="1.0" friction="0.0" />
+      <dynamics damping="0.0" friction="2.0" />
       <limit lower="-1.19" upper="0" effort="60" velocity="15" />
     </joint>
 
