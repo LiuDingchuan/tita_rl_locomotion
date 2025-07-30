@@ -2,7 +2,7 @@
  * @Author: hilab-workshop-ldc 2482812356@qq.com
  * @Date: 2025-03-20 15:25:00
  * @LastEditors: hilab-workshop-ldc 2482812356@qq.com
- * @LastEditTime: 2025-04-23 17:25:57
+ * @LastEditTime: 2025-07-30 13:56:18
  * @FilePath: /tita_rl_sim2sim2real/src/tita_locomotion/interaction/keyboard_controller/include/keyboard_controller/keyboard_controller.hpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -35,7 +35,7 @@
 #define STEP_POSITION 0.01
 #define STEP_HEIGHT 0.1
 
-#define MAX_VEL_X 1.0
+#define MAX_VEL_X 0.5
 #define MAX_VEL_W 1.0
 #define MAX_ORIENTATION 0.2
 #define MAX_POSITION 0.1
