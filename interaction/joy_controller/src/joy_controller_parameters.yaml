@@ -1,7 +1,7 @@
 joy_controller:
   twist_linear_ratio: {
     type: double,
-    default_value: 1,
+    default_value: 0.5,
     description: "Max velocity of command input",
     validation: { bounds<>: [0.0, 10.0] },
   }

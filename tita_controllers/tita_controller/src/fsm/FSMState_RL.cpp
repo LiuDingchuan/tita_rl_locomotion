@@ -19,7 +19,9 @@ FSMState_RL::FSMState_RL(std::shared_ptr<ControlFSMData> data)
       output_last(new float[DOF]),
       input_1_temp(new float[temp_history_len_all])
 {
-  cuda_test_ = std::make_shared<CudaTest>("/home/wex/rl_model/model_gn.engine");
+  cuda_test_ = std::make_shared<CudaTest>("/home/wex/rl_model/stair_gai.engine");
+  // cuda_test_ = std::make_shared<CudaTest>("/home/wex/rl_model/stair_soft.engine");
+  // cuda_test_ = std::make_shared<CudaTest>("/home/wex/rl_model/terrain_20000_imi.engine");
   std::cout << "cuda init :" << cuda_test_->get_cuda_init() << std::endl;
 }
 
@@ -161,11 +163,14 @@ void FSMState_RL::run()
     {
       _data->low_cmd->qd_dot[i] = 20 * desired_pos[i];
       _data->low_cmd->tau_cmd[i] = 10 * desired_pos[i] - 0.5 * _data->low_state->dq[i];
+      // _data->low_cmd->qd_dot[i] = 10 * desired_pos[i];
+      // _data->low_cmd->tau_cmd[i] = 10 * desired_pos[i] - 1.0 * _data->low_state->dq[i];
     }
     else // 关节？
     {
       _data->low_cmd->qd[i] = desired_pos[i];
       _data->low_cmd->tau_cmd[i] = 40 * (desired_pos[i] - _data->low_state->q[i]) + 1.0 * (0 - _data->low_state->dq[i]);
+      // _data->low_cmd->tau_cmd[i] = 30 * (desired_pos[i] - _data->low_state->q[i]) + 2.0 * (0 - _data->low_state->dq[i]);
       if (desired_pos[i] > 1000) // 防止抽风，保护一下
       {
         bad_rl_error = true;
