@@ -161,6 +161,7 @@ void FSMState_RL::run()
   {
     if (i % (DOF / 2) == (DOF / 2 - 1)) // 轮子
     {
+      _data->low_cmd->qd[i] = desired_pos[i];
       _data->low_cmd->qd_dot[i] = 20 * desired_pos[i];
       _data->low_cmd->tau_cmd[i] = 10 * desired_pos[i] - 0.5 * _data->low_state->dq[i];
       // _data->low_cmd->qd_dot[i] = 10 * desired_pos[i];

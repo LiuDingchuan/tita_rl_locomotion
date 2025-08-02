@@ -83,6 +83,7 @@ namespace tita_locomotion
     InertiaUnit mImu;
     std::shared_ptr<SerialHandle> diablo_joint_sdk_;
     motor_torque_t sendStruct_;
+    motor_pos_t sendPosStruct_;
     std::vector<double> joint_direction_ = {-1., -1., 1., -1., -1., 1.};
     std::vector<double> joint_offset_ = {2 * M_PI - 3.256 + 0.1845, 2 * M_PI, 0.,
                                          -3.266 + 0.1845, 0., 0.};//0.1845是趴姿的关节角到urdf关节零点之间的角度差

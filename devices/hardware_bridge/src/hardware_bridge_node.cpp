@@ -69,6 +69,7 @@ namespace tita_locomotion
    *         这些接口会被控制器使用来获取关节状态和发送命令
    *         这里的状态接口包括关节位置、速度、力矩等信息
    *          主要是通过将地址导出的方式进行的
+
    * @author: Dandelion
    * @Date: 2025-06-16 18:19:29
    * @return {*}
@@ -109,7 +110,12 @@ namespace tita_locomotion
     }
     return interfaces;
   }
-
+  /**
+   * @brief: 命令接口机制，通过ROS2控制器管理器自动将
+   * @author: Dandelion
+   * @Date: 2025-08-01 15:27:24
+   * @return {*}
+   */
   std::vector<hardware_interface::CommandInterface> HardwareBridge::export_command_interfaces()
   {
     std::vector<hardware_interface::CommandInterface> interfaces;
@@ -213,6 +219,7 @@ namespace tita_locomotion
   {
     // std::cout << "write " << std::endl ;
     float motorCmd[6] = {0, 0, 0, 0, 0, 0};
+    float motorPosCmd[6] = {0, 0, 0, 0, 0, 0};
     if (direct_mode_)
     {
       std::vector<double> cmd_torque;
@@ -222,6 +229,7 @@ namespace tita_locomotion
         //                                   mJoints[id].kp * (mJoints[id].positionCommand - mJoints[id].position) +
         //                                   mJoints[id].kd * (mJoints[id].velocityCommand - mJoints[id].velocity));
         motorCmd[id] = static_cast<float>(mJoints[id].effortCommand);
+        motorPosCmd[id] = static_cast<float>(mJoints[id].positionCommand);
       }
     }
     // std::cout << "effortcommand" <<  << std::endl;
@@ -231,12 +239,26 @@ namespace tita_locomotion
 
     // motorCmd[2] = 0;
     // motorCmd[5] = 0;
+    // std::cout << "hipPosRaw: " << motorPosCmd[0] << " kneePosRaw: " << motorPosCmd[1] << " wheelPosRaw: " << motorPosCmd[2];
     for (size_t id = 0; id < 6; ++id)
     {
       motorCmd[id] = joint_direction_[id] * motorCmd[id];
+      motorPosCmd[id] = joint_direction_[id] * motorPosCmd[id] - joint_offset_[id];
     }
-    diablo_joint_sdk_->create_package(motorCmd, sendStruct_);
-    diablo_joint_sdk_->send_commond(sendStruct_);
+    if(motorCmd[0] == 0 && motorCmd[1] == 0 && motorCmd[2] == 0 &&
+       motorCmd[3] == 0 && motorCmd[4] == 0 && motorCmd[5] == 0) //确保进入的是passive模式
+    {
+      diablo_joint_sdk_->create_package(motorCmd, sendStruct_);
+      diablo_joint_sdk_->send_commond(sendStruct_);
+    }
+    else
+    {
+      // std::cout << " hipPos: " << motorPosCmd[0] << " kneePosRaw: " << motorPosCmd[1] << " wheelPosRaw: " << motorPosCmd[2] << std::endl;
+      diablo_joint_sdk_->create_package_pos(motorPosCmd, sendPosStruct_);
+      diablo_joint_sdk_->send_command_pos(sendPosStruct_);
+    }
+    // std::cout << "write end" << std::endl;
+    // robot_->set_motors_sdk(direct_mode_);
     return hardware_interface::return_type::OK;
   }
 

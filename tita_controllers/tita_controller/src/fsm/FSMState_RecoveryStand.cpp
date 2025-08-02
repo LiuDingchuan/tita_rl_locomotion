@@ -298,6 +298,7 @@ void FSMState_RecoveryStand::_HeadUp(const int &curr_iter)
   {
     bound(_data->low_cmd->tau_cmd(i), _data->params->torque_limit[i]);
   }
+  _data->low_cmd->qd(2) = _data->low_cmd->qd(5) = 0.0; //防止发送到joint_sdk里的速度指令是一个很大的位置值
 }
 
 /**

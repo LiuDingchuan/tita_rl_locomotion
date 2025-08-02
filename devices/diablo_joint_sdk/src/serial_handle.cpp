@@ -104,6 +104,7 @@ void SerialHandle::create_package(_Float32 *motor_tor, motor_torque_t &motor_pac
 {
     motor_package.header = 0xBBAA;
     motor_package.frame_cnt = send_cnt;
+    motor_package.mode_check = 0; // 0: torque control mode
     motor_package.left_hip_tor = torque_2_package(motor_tor[0]);
     motor_package.left_knee_tor = torque_2_package(motor_tor[1]);
     motor_package.left_wheel_tor = torque_2_package(motor_tor[2]);
@@ -113,6 +114,23 @@ void SerialHandle::create_package(_Float32 *motor_tor, motor_torque_t &motor_pac
     uint8_t serial_txbuf[100];
     memcpy(serial_txbuf, &motor_package, sizeof(motor_torque_t) - 2);
     uint16_t CRC16 = JOINT_CTRL::update_crc16(serial_txbuf, sizeof(motor_torque_t) - 2);
+    motor_package.CRC16 = CRC16;
+}
+
+void SerialHandle::create_package_pos(_Float32 *motor_pos, motor_pos_t &motor_package)
+{
+    motor_package.header = 0xBBAA;
+    motor_package.frame_cnt = send_cnt;
+    motor_package.mode_check = 1; // 1: position control mode
+    motor_package.left_hip_pos = (int16_t)(motor_pos[0] * 1000);
+    motor_package.left_knee_pos = (int16_t)(motor_pos[1] * 1000);
+    motor_package.left_wheel_vel = (int16_t)(motor_pos[2] * 1000);
+    motor_package.right_hip_pos = (int16_t)(motor_pos[3] * 1000);
+    motor_package.right_knee_pos = (int16_t)(motor_pos[4] * 1000);
+    motor_package.right_wheel_vel = (int16_t)(motor_pos[5] * 1000);
+    uint8_t serial_txbuf[100];
+    memcpy(serial_txbuf, &motor_package, sizeof(motor_pos_t) - 2);
+    uint16_t CRC16 = JOINT_CTRL::update_crc16(serial_txbuf, sizeof(motor_pos_t) - 2);
     motor_package.CRC16 = CRC16;
 }
 
@@ -131,6 +149,19 @@ void SerialHandle::send_commond(const motor_torque_t &ctrl_package)
     // std::cout << "send cnt "<< send_cnt << std::endl ;
 
     // if(send_cnt > 10000) send_cnt=0;
+}
+
+void SerialHandle::send_command_pos(const motor_pos_t &ctrl_package)
+{
+    uint8_t serial_txbuf[100];
+    memcpy(serial_txbuf, &ctrl_package, sizeof(motor_pos_t));
+    // for(uint16_t i = 0; i < sizeof(motor_pos_t); i++){
+    //     printf("0x%x,",serial_txbuf[i]);
+    // }
+    {
+        mySerial.Write(serial_txbuf, sizeof(motor_pos_t));
+        send_cnt += 1;
+    }
 }
 
 void SerialHandle::start_joint_sdk(void)

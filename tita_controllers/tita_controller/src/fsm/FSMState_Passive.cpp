@@ -16,6 +16,7 @@ void FSMState_Passive::run()
   //   std::make_shared<DesiredStateCommand::RemoteControlData>());
   _data->state_command->clear();
   _data->low_cmd->zero();
+  _data->low_cmd->qd = _data->low_state->q; //防止用joint_sdk_pos_mode进入passive模式的时候会突然有个很大的力矩
 
   // if(!_data->params_->ee_name_.empty()){
   //   Eigen::VectorXd kp_joint, kd_joint;
