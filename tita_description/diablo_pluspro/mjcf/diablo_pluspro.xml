@@ -1,0 +1,101 @@
+<mujoco model="diablo_pluspro">
+  <compiler angle="radian" meshdir="meshes/"/>
+    <option timestep= '0.001' solver='PGS' gravity='0 0 -9.81'>
+    </option>
+    <size njmax="500" nconmax="100" />
+
+    <default>
+      <default class="diablo_pluspro">
+        <joint armature="0.01" damping="0.01"/>
+        <default class="visual">
+          <geom type="mesh" contype="0" conaffinity="0" group="2"/>
+        </default>
+        <geom rgba="0.8 0.8 0.8 1" contype="1" conaffinity="1" condim="3" 
+          friction="0.6 0.005 0.0001" margin="0.001" group="0" />
+      </default>
+    </default>
+  <asset>
+    <material name="metal" rgba=".9 .95 .95 1" />
+    <material name="black" rgba="0 0 0 1" />
+    <material name="white" rgba="1 1 1 1" />
+    <material name="gray" rgba="0.671705 0.692426 0.774270 1" />
+    <mesh name="base_link" file="/usr/share/robot_description/diablo_pluspro/meshes/base_link.STL"/>
+    <mesh name="left_hip_link" file="/usr/share/robot_description/diablo_pluspro/meshes/left_hip_link.STL"/>
+    <mesh name="left_knee_link" file="/usr/share/robot_description/diablo_pluspro/meshes/left_knee_link.STL"/>
+    <mesh name="left_wheel_link" file="/usr/share/robot_description/diablo_pluspro/meshes/left_wheel_link.STL"/>
+    <mesh name="right_hip_link" file="/usr/share/robot_description/diablo_pluspro/meshes/right_hip_link.STL"/>
+    <mesh name="right_knee_link" file="/usr/share/robot_description/diablo_pluspro/meshes/right_knee_link.STL"/>
+    <mesh name="right_wheel_link" file="/usr/share/robot_description/diablo_pluspro/meshes/right_wheel_link.STL"/>
+    <!-- <texture type='skybox' builtin='gradient' width='512' height='512' rgb1="1.0 1.0 1.0" rgb2="1.0 1.0 1.0"/> -->
+    <!-- <texture name="texplane" type="2d" builtin="checker" rgb1="0.35 0.35 0.35" rgb2="0.55 0.55 0.55" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/> -->
+    <!-- <material name="matplane" reflectance="0.0" texture="texplane" texrepeat="1 1" texuniform="true"/> -->
+  </asset>
+
+  <worldbody>
+    <!-- <camera name="track" mode="trackcom" pos="0 -2.3 1.6" xyaxes="1 0 0 0 0.707 0.707"/>
+    <light directional="true" diffuse=".8 .8 .8" pos="0 0 10" dir="0 0 -10"/> -->
+    <body name="base_link" pos="0 0 0.52">
+      <inertial pos="0.0028918 -0.00051043 0.10837" quat="0.909393 0.000259629 0.00940471 0.415832" mass="16.387" diaginertia="0.672438 0.548374 0.359328"/>
+      <joint type="free" limited="false"  damping="0.0000" stiffness="0.0000" armature="0"/>
+      <site name="imu" pos="0 0 0.261"/>
+      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="1 1 1 1" mesh="base_link"/>
+      <geom type="mesh" rgba="1 1 1 1" mesh="base_link"/>
+      <body name="left_hip_link" pos="0 0.14844 0">
+        <inertial pos="-0.0114677 -0.0283584 -0.0125666" quat="0.688341 0.30661 0.1973 0.627097" mass="2.39228" diaginertia="0.0104669 0.00957172 0.00372541"/>
+        <joint name="left_hip_joint" pos="0 0 0" axis="0 1 0" range="-1.57 1.57" actuatorfrcrange="-60 60" armature="0.042" damping="0.5" frictionloss="0.0"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="1 1 1 1" mesh="left_hip_link"/>
+        <geom type="mesh" rgba="1 1 1 1" mesh="left_hip_link"/>
+        <body name="left_knee_link" pos="-0.12022 0 -0.15983">
+          <inertial pos="0.0529437 -0.0059746 -0.081982" quat="0.254556 0.645301 0.659852 0.28876" mass="0.55812" diaginertia="0.00497661 0.00480655 0.000261071"/>
+          <joint name="left_knee_joint" pos="0 0 0" axis="0 1 0" range="-1.19 0" actuatorfrcrange="-60 60" armature="0.042" damping="0.5" frictionloss="0.0"/>
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="1 1 1 1" mesh="left_knee_link"/>
+          <geom type="mesh" rgba="1 1 1 1" mesh="left_knee_link"/>
+          <body name="left_wheel_link" pos="0.13397 0 -0.1485">
+            <inertial pos="0 0.0531069 0" quat="0.70711 0 0 0.707104" mass="2.785" diaginertia="0.0738154 0.0373934 0.0373934"/>
+            <joint name="left_wheel_joint" pos="0 0 0" axis="0 1 0" range="-1000000 1000000" actuatorfrcrange="-20 20" armature="0.003" damping="0.00" frictionloss="0.0"/>
+            <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="1 0.423529 0.0392157 1" mesh="left_wheel_link"/>
+            <geom size="0.16 0.0175" pos="0 0.053 0" quat="0.707107 0.707107 0 0" type="cylinder" rgba="1 0.423529 0.0392157 1"/>
+          </body>
+        </body>
+      </body>
+      <body name="right_hip_link" pos="0 -0.1484 0">
+        <inertial pos="-0.0114677 0.0283584 -0.0125666" quat="0.688341 0.30661 0.1973 0.627097" mass="2.39228" diaginertia="0.0104669 0.00957172 0.00372541"/>
+        <joint name="right_hip_joint" pos="0 0 0" axis="0 1 0" range="-1.57 1.57" actuatorfrcrange="-60 60" armature="0.042" damping="0.5" frictionloss="0.0"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="1 1 1 1" mesh="right_hip_link"/>
+        <geom type="mesh" rgba="1 1 1 1" mesh="right_hip_link"/>
+        <body name="right_knee_link" pos="-0.12022 0 -0.15983">
+          <inertial pos="0.0529437 0.0059746 -0.081982" quat="0.254556 0.645301 0.659852 0.28876" mass="0.55812" diaginertia="0.00497661 0.00480655 0.000261071"/>
+          <joint name="right_knee_joint" pos="0 0 0" axis="0 1 0" range="-1.19 0" actuatorfrcrange="-60 60" armature="0.042" damping="0.5" frictionloss="0.0"/>
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="1 1 1 1" mesh="right_knee_link"/>
+          <geom type="mesh" rgba="1 1 1 1" mesh="right_knee_link"/>
+          <body name="right_wheel_link" pos="0.13397 0 -0.1485">
+            <inertial pos="0 -0.0531069 0" quat="0.70711 0 0 0.707104" mass="2.785" diaginertia="0.0738154 0.0373934 0.0373934"/>
+            <joint name="right_wheel_joint" pos="0 0 0" axis="0 1 0" range="-1000000 1000000" actuatorfrcrange="-20 20" armature="0.003" damping="0.0" frictionloss="0.0"/>
+            <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="1 0.423529 0.0392157 1" mesh="right_wheel_link"/>
+            <geom size="0.16 0.0175" pos="0 -0.053 0" quat="0.707107 0.707107 0 0" type="cylinder" rgba="1 0.423529 0.0392157 1"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <actuator>
+      <motor name="left_hip_joint"   gear="1"  joint="left_hip_joint"  ctrllimited='true' ctrlrange='-60 60'/>
+      <motor name="left_knee_joint"  gear="1"  joint="left_knee_joint" ctrllimited='true' ctrlrange='-60 60'/>
+      <motor name="left_wheel_joint" gear="1"  joint="left_wheel_joint" ctrllimited='true' ctrlrange='-20 20'/>
+      <motor name="right_hip_joint"  gear="1"  joint="right_hip_joint" ctrllimited='true' ctrlrange='-60 60'/>
+      <motor name="right_knee_joint" gear="1"  joint="right_knee_joint" ctrllimited='true' ctrlrange='-60 60'/>
+      <motor name="right_wheel_joint" gear="1"  joint="right_wheel_joint" ctrllimited='true' ctrlrange='-20 20'/>
+  </actuator>
+
+  <sensor>
+    <framequat name="imu_quat" objtype="site" objname="imu"/>
+    <gyro name="imu_gyro" site="imu"/>
+    <accelerometer name="imu_accel" site="imu"/>
+    <jointpos name="left_hip_joint" joint="left_hip_joint"/>
+    <jointpos name="left_knee_joint" joint="left_knee_joint"/>
+    <jointpos name="left_wheel_joint" joint="left_wheel_joint"/>
+    <jointpos name="right_hip_joint" joint="right_hip_joint"/>
+    <jointpos name="right_knee_joint" joint="right_knee_joint"/>
+    <jointpos name="right_wheel_joint" joint="right_wheel_joint"/>
+  </sensor>
+</mujoco>

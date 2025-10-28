@@ -35,7 +35,7 @@ def generate_launch_description():
             "sim_env",
             default_value="gazebo",
             description="Select simulation environment",
-            choices=["webots", "gazebo"],
+            choices=["webots", "gazebo", "mujoco"],
         )
     )
 
@@ -91,6 +91,24 @@ def generate_launch_description():
         ),
     )
 
+    mujoco_controller_manager_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("mujoco_bridge"),
+                "launch",
+                "mujoco_bridge.launch.py",
+            )
+        ),
+        launch_arguments={
+            "ctrl_mode": LaunchConfiguration("ctrl_mode"),
+            "urdf": urdf,
+            "yaml_path": yaml_path,
+        }.items(),
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("sim_env"), "' == 'mujoco'"])
+        ),
+    )
+
     # Include the robot inertia calculator launch file #tofix
     robot_inertia_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -143,6 +161,7 @@ def generate_launch_description():
         + [
             webots_controller_manager_launch,
             gazebo_controller_manager_launch,
+            mujoco_controller_manager_launch,
             joint_state_broadcaster_spawner,
             imu_sensor_broadcaster_spawner,
             wbc_controller,

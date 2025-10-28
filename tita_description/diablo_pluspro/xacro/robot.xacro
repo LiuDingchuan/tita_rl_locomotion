@@ -34,6 +34,10 @@
     <xacro:property name="name" value="WebotsControl" />
   </xacro:if>
 
+  <xacro:if value="${sim_env == 'mujoco'}">
+    <xacro:property name="name" value="MujocoControl" />
+  </xacro:if>
+
   <xacro:description />
   <xacro:ros2control name="${name}" ctrl_mode="$(arg ctrl_mode)" sim_env="$(arg sim_env)" yaml_path="$(arg yaml_path)" />
 

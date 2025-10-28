@@ -81,6 +81,9 @@
         <xacro:if value="${sim_env == 'gazebo'}">
           <plugin>usr_gazebo_ros2_control/GazeboBridge</plugin>
         </xacro:if>
+        <xacro:if value="${sim_env == 'mujoco'}">
+          <plugin>mujoco_ros2_control/MujocoBridge</plugin>
+        </xacro:if>
         <xacro:if value="${sim_env == 'none'}">
           <plugin>tita_locomotion::HardwareBridge</plugin>
           <param name="ctrl_mode">${ctrl_mode}</param>
@@ -99,7 +102,7 @@
         <command_interface name="kd"/>
 
         <state_interface name="position">
-          <param name="initial_value">0.0</param>
+          <param name="initial_value">-0.19</param>
         </state_interface>
         <state_interface name="velocity"/>
         <state_interface name="effort"/>
@@ -115,7 +118,7 @@
         <command_interface name="kd"/>
 
         <state_interface name="position">
-          <param name="initial_value">0.0</param>
+          <param name="initial_value">-1.19</param>
         </state_interface>
         <state_interface name="velocity"/>
         <state_interface name="effort"/>
@@ -148,7 +151,7 @@
         <command_interface name="kd"/>
 
         <state_interface name="position">
-          <param name="initial_value">0.0</param>
+          <param name="initial_value">-0.19</param>
         </state_interface>
         <state_interface name="velocity"/>
         <state_interface name="effort"/>
@@ -164,7 +167,7 @@
         <command_interface name="kd"/>
 
         <state_interface name="position">
-          <param name="initial_value">0.0</param>
+          <param name="initial_value">-1.19</param>
         </state_interface>
         <state_interface name="velocity"/>
         <state_interface name="effort"/>
