@@ -1,0 +1,259 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="ros2control" params="name ctrl_mode sim_env yaml_path">
+
+    <!-- ================================================================== -->
+    <!--                         Adjustable Parameters                      -->
+    <!-- ================================================================== -->
+
+    <!-- Joint Effort Limits -->
+    <xacro:property name="joint_effort_max" value="80"/>
+    <xacro:property name="joint_effort_min" value="-80"/>
+    <xacro:property name="wheel_effort_max" value="20"/>
+    <xacro:property name="wheel_effort_min" value="-20"/>
+
+    <!-- Initial Positions -->
+    <xacro:property name="FL_hip_init" value="0.0"/>
+    <xacro:property name="FL_thigh_init" value="0.79"/>
+    <xacro:property name="FL_calf_init" value="-1.57"/>
+    <xacro:property name="FL_foot_init" value="0.0"/>
+    
+    <xacro:property name="FR_hip_init" value="0.0"/>
+    <xacro:property name="FR_thigh_init" value="0.79"/>
+    <xacro:property name="FR_calf_init" value="-1.57"/>
+    <xacro:property name="FR_foot_init" value="0.0"/>
+
+    <!-- ================================================================== -->
+    <!--                         Webots Settings                            -->
+    <!-- ================================================================== -->
+
+    <xacro:if value="${sim_env == 'webots'}">
+      <webots>
+        <plugin type="webots_ros2_control::Ros2Control" />
+      </webots>
+    </xacro:if>
+    <!-- ================================================================== -->
+    <!--                         Gazebo Settings                            -->
+    <!-- ================================================================== -->
+
+    <xacro:if value="${sim_env == 'gazebo'}">
+      <gazebo reference="base_link">
+        <gravity>true</gravity>
+      </gazebo>
+      <gazebo reference="F_base_link">
+        <gravity>true</gravity>
+        <self_collide>false</self_collide>
+      </gazebo>
+      
+      <!-- Left Leg Gravity -->
+      <gazebo reference="FL_hip">
+        <gravity>true</gravity>
+        <self_collide>false</self_collide></gazebo>
+      <gazebo reference="FL_thigh">
+        <gravity>true</gravity>
+        <self_collide>false</self_collide></gazebo>
+      <gazebo reference="FL_calf">
+        <gravity>true</gravity>
+        <self_collide>false</self_collide></gazebo>
+      <gazebo reference="FL_foot">
+        <gravity>true</gravity>
+        <self_collide>false</self_collide></gazebo>
+
+      <!-- Right Leg Gravity -->
+      <gazebo reference="FR_hip">
+        <gravity>true</gravity>
+        <self_collide>false</self_collide></gazebo>
+      <gazebo reference="FR_thigh">
+        <gravity>true</gravity>
+        <self_collide>false</self_collide></gazebo>
+      <gazebo reference="FR_calf">
+        <gravity>true</gravity>
+        <self_collide>false</self_collide></gazebo>
+      <gazebo reference="FR_foot">
+        <gravity>true</gravity>
+        <self_collide>false</self_collide></gazebo>
+
+      <gazebo>
+        <is_static>true</is_static>
+        <self_collide>true</self_collide>
+      </gazebo>
+
+      <gazebo>
+        <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+          <namespace>tita</namespace>
+          <parameters>$(find ${yaml_path})/config/ddt_b1_controllers.yaml</parameters>
+        </plugin>
+      </gazebo>
+    </xacro:if>
+
+    <!-- ================================================================== -->
+    <!--                         ROS2 Control                               -->
+    <!-- ================================================================== -->
+
+    <ros2_control name="${name}" type="system">
+      <hardware>
+        <xacro:if value="${sim_env == 'webots'}">
+          <plugin>tita_webots_ros2_control::WebotsBridge</plugin>
+        </xacro:if>
+        <xacro:if value="${sim_env == 'gazebo'}">
+          <plugin>usr_gazebo_ros2_control/GazeboBridge</plugin>
+        </xacro:if>
+        <xacro:if value="${sim_env == 'mujoco'}">
+          <plugin>mujoco_ros2_control/MujocoBridge</plugin>
+        </xacro:if>
+        <xacro:if value="${sim_env == 'none'}">
+          <plugin>tita_locomotion::HardwareBridge</plugin>
+          <param name="ctrl_mode">${ctrl_mode}</param>
+        </xacro:if>
+      </hardware>
+
+      <!-- FL Leg Joints -->
+      <joint name="FL_hip_joint">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort">
+          <param name="min">${joint_effort_min}</param>
+          <param name="max">${joint_effort_max}</param>
+        </command_interface>
+        <command_interface name="kp"/>
+        <command_interface name="kd"/>
+        <state_interface name="position">
+          <param name="initial_value">${FL_hip_init}</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+
+      <joint name="FL_thigh_joint">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort">
+          <param name="min">${joint_effort_min}</param>
+          <param name="max">${joint_effort_max}</param>
+        </command_interface>
+        <command_interface name="kp"/>
+        <command_interface name="kd"/>
+        <state_interface name="position">
+          <param name="initial_value">${FL_thigh_init}</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+
+      <joint name="FL_calf_joint">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort">
+          <param name="min">${joint_effort_min}</param>
+          <param name="max">${joint_effort_max}</param>
+        </command_interface>
+        <command_interface name="kp"/>
+        <command_interface name="kd"/>
+        <state_interface name="position">
+          <param name="initial_value">${FL_calf_init}</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+
+      <joint name="FL_foot_joint">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort">
+          <param name="min">${wheel_effort_min}</param>
+          <param name="max">${wheel_effort_max}</param>
+        </command_interface>
+        <command_interface name="kp"/>
+        <command_interface name="kd"/>
+        <state_interface name="position">
+          <param name="initial_value">${FL_foot_init}</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+
+      <!-- FR Leg Joints -->
+      <joint name="FR_hip_joint">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort">
+          <param name="min">${joint_effort_min}</param>
+          <param name="max">${joint_effort_max}</param>
+        </command_interface>
+        <command_interface name="kp"/>
+        <command_interface name="kd"/>
+        <state_interface name="position">
+          <param name="initial_value">${FR_hip_init}</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+
+      <joint name="FR_thigh_joint">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort">
+          <param name="min">${joint_effort_min}</param>
+          <param name="max">${joint_effort_max}</param>
+        </command_interface>
+        <command_interface name="kp"/>
+        <command_interface name="kd"/>
+        <state_interface name="position">
+          <param name="initial_value">${FR_thigh_init}</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+
+      <joint name="FR_calf_joint">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort">
+          <param name="min">${joint_effort_min}</param>
+          <param name="max">${joint_effort_max}</param>
+        </command_interface>
+        <command_interface name="kp"/>
+        <command_interface name="kd"/>
+        <state_interface name="position">
+          <param name="initial_value">${FR_calf_init}</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+
+      <joint name="FR_foot_joint">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort">
+          <param name="min">${wheel_effort_min}</param>
+          <param name="max">${wheel_effort_max}</param>
+        </command_interface>
+        <command_interface name="kp"/>
+        <command_interface name="kd"/>
+        <state_interface name="position">
+          <param name="initial_value">${FR_foot_init}</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+
+      <!-- IMU Sensor -->
+      <sensor name="imu_sensor">
+        <state_interface name="orientation.x"/>
+        <state_interface name="orientation.y"/>
+        <state_interface name="orientation.z"/>
+        <state_interface name="orientation.w"/>
+        <state_interface name="angular_velocity.x"/>
+        <state_interface name="angular_velocity.y"/>
+        <state_interface name="angular_velocity.z"/>
+        <state_interface name="linear_acceleration.x"/>
+        <state_interface name="linear_acceleration.y"/>
+        <state_interface name="linear_acceleration.z"/>
+      </sensor>
+
+    </ros2_control>
+
+  </xacro:macro>
+
+</robot>

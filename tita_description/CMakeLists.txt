@@ -17,7 +17,7 @@ elseif($ENV{ROS_VERSION} EQUAL 2)
 
   find_package(ament_cmake REQUIRED)
 
-  install(DIRECTORY launch tita diablo_pluspro tower rviz DESTINATION share/${PROJECT_NAME})
+  install(DIRECTORY launch ddt_b1 tita diablo_pluspro tower rviz DESTINATION share/${PROJECT_NAME})
 
   ament_package()
 endif()

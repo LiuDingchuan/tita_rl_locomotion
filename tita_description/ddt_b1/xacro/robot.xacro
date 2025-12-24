@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="ddt_b1">
+  <xacro:arg name="prefix" default="" />
+  <xacro:arg name="sim_env" default="none" />
+  <xacro:arg name="ctrl_mode" default="effort" />
+  <xacro:arg name="yaml_path" default="" />
+  
+  <xacro:property name="sim_env" value="$(arg sim_env)" />
+  <xacro:property name="ctrl_mode" value="$(arg ctrl_mode)" />
+  
+  <xacro:include filename="$(find tita_description)/ddt_b1/xacro/gazebo.xacro" />
+  <xacro:include filename="$(find tita_description)/ddt_b1/xacro/materials.xacro" />
+  <xacro:include filename="$(find tita_description)/ddt_b1/xacro/description.xacro" />
+  <xacro:include filename="$(find tita_description)/ddt_b1/xacro/ros2control.xacro" />
+
+  <xacro:if value="${sim_env == 'none'}">
+    <xacro:property name="name" value="HardwareControl" />
+  </xacro:if>
+
+  <xacro:if value="${sim_env == 'gazebo'}">
+    <xacro:property name="name" value="GazeboControl" />
+  </xacro:if>
+
+  <xacro:if value="${sim_env == 'webots'}">
+    <xacro:property name="name" value="WebotsControl" />
+  </xacro:if>
+
+  <xacro:if value="${sim_env == 'mujoco'}">
+    <xacro:property name="name" value="MujocoControl" />
+  </xacro:if>
+
+  <xacro:description />
+  <xacro:ros2control name="${name}" ctrl_mode="$(arg ctrl_mode)" sim_env="$(arg sim_env)" yaml_path="$(arg yaml_path)" />
+
+</robot>
