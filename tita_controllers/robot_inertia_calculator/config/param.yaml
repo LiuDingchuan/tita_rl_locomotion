@@ -33,6 +33,6 @@
       
       tita_urdf_path: /usr/share/robot_description/tita/urdf/robot.urdf
       diablo_pluspro_urdf_path: /usr/share/robot_description/diablo_pluspro/urdf/diablo_pluspro.urdf
-    
+      b1_urdf_path: /usr/share/robot_description/ddt_b1/urdf/ddt_b1.urdf
 
       
