@@ -38,12 +38,32 @@
     <!-- ================================================================== -->
 
     <xacro:if value="${sim_env == 'gazebo'}">
+      <gazebo reference="imu_link">
+        <gravity>true</gravity>
+        <sensor name="imu" type="imu">
+          <always_on>true</always_on>
+          <update_rate>500</update_rate>
+          <!-- <visualize>true</visualize>
+            <topic>__default_topic__</topic>
+            <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+                <topicName>base_imu</topicName>
+                <bodyName>imu_link</bodyName>
+                <updateRateHZ>1000.0</updateRateHZ>
+                <gaussianNoise>0.00</gaussianNoise>
+                <xyzOffset>0 0 0</xyzOffset>
+                <rpyOffset>0 0 0</rpyOffset>
+                <frameName>imu_link</frameName>
+            </plugin>
+            <pose>0 0 0 0 0 0</pose> -->
+        </sensor>
+      </gazebo>
+
       <gazebo reference="base_link">
         <gravity>true</gravity>
       </gazebo>
       <gazebo reference="F_base_link">
-        <gravity>true</gravity>
         <self_collide>false</self_collide>
+        <gravity>true</gravity>
       </gazebo>
       
       <!-- Left Leg Gravity -->
@@ -239,7 +259,7 @@
       </joint>
 
       <!-- IMU Sensor -->
-      <sensor name="imu_sensor">
+      <sensor name="imu">
         <state_interface name="orientation.x"/>
         <state_interface name="orientation.y"/>
         <state_interface name="orientation.z"/>

@@ -23,20 +23,13 @@
 
 struct RobotControlParameters
 {
-  RobotControlParameters()
-  {
-    torque_limit = {70.0, 70.0, 20.0, 70.0, 70.0, 20.0};
-    joint_kp = {40.0, 40.0, 10.0, 40.0, 40.0, 1.0};
-    joint_kd = {1.0, 1.0, 0.5, 1.0, 1.0, 0.5};
-    wheel_joint_name = {"left_wheel_joint", "right_wheel_joint"};
-  }
   scalar_t wheel_radius{0.16};
   scalar_t sliding_friction_coefficient{0.5};
   scalar_t static_friction_coefficient{0.8};
-  std::string base_name{"base_link"};
+  std::string base_name{"F_base_link"};
   std::vector<std::string> wheel_joint_name;
-  std::string robot_description{"/usr/share/robot_description/diablo_pluspro/urdf/diablo_pluspro.urdf"};
-  size_t dof_chassis{6}, dof_arm{6};
+  std::string robot_description{"/usr/share/robot_description/ddt_b1/xacro/robot.xacro"};
+  size_t dof_chassis{6};
 
   // control param
   scalar_t dt;          // actual control period

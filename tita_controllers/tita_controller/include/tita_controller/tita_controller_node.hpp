@@ -44,7 +44,8 @@
 #include "locomotion_msgs/msg/plan_commands.hpp"
 #include "locomotion_msgs/msg/rigid_body.hpp"
 #include "locomotion_msgs/msg/robot_states.hpp"
-#include "tita_controller_parameters.hpp"
+// #include "tita_controller_parameters.hpp"
+#include "b1_controller_parameters.hpp"
 #include "tita_utils/topic_names.hpp"
 namespace tita_locomotion
 {

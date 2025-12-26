@@ -33,7 +33,7 @@ def generate_launch_description():
             "sim_env",
             default_value="gazebo",
             description="Select simulation environment",
-            choices=["webots", "gazebo"],
+            choices=["webots", "gazebo", "mujoco"],
         )
     )
     declared_arguments.append(
@@ -44,7 +44,13 @@ def generate_launch_description():
             description="Select wheel-legged robot control methods, mcu means on mcu-board control",
         )
     )
-
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "robot_name",
+            default_value="ddt_b1",
+            description="Robot name (folder name in tita_description)",
+        )
+    )
     urdf = "robot.xacro"
     yaml_path = "locomotion_bringup"
     # launch webots bridge
@@ -76,14 +82,34 @@ def generate_launch_description():
         ),
         launch_arguments={
             "ctrl_mode": LaunchConfiguration("ctrl_mode"),
+            "robot_name": LaunchConfiguration("robot_name"),
             "urdf": urdf,
             "yaml_path": yaml_path,
+            "paused": "true",
         }.items(),
         condition=IfCondition(
             PythonExpression(["'", LaunchConfiguration("sim_env"), "' == 'gazebo'"])
         ),
     )
     # add extra controllers launch or node
+
+    mujoco_controller_manager_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("mujoco_bridge"),
+                "launch",
+                "mujoco_bridge.launch.py",
+            )
+        ),
+        launch_arguments={
+            "ctrl_mode": LaunchConfiguration("ctrl_mode"),
+            "urdf": urdf,
+            "yaml_path": yaml_path,
+        }.items(),
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("sim_env"), "' == 'mujoco'"])
+        ),
+    )
 
     robot_inertia_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -132,6 +158,7 @@ def generate_launch_description():
         + [
             webots_controller_manager_launch,
             gazebo_controller_manager_launch,
+            mujoco_controller_manager_launch,
             joint_state_broadcaster_spawner,
             imu_sensor_broadcaster_spawner,
             wbc_controller,

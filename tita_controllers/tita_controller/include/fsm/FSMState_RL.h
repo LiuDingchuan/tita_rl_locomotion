@@ -5,7 +5,7 @@
 #include "FSMState.h"
 #include "tensorrt_cuda/tensor_cuda_test.hpp"
 
-#define DOF 6
+#define DOF 8
 /**
  *
  */

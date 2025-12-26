@@ -77,7 +77,7 @@ def generate_launch_description():
             os.path.join(
                 get_package_share_directory("gazebo_bridge"),
                 "launch",
-                "gazebo_bridge2.launch.py",
+                "gazebo_bridge_diablo_pluspro.launch.py",
             )
         ),
         launch_arguments={

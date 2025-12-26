@@ -2,7 +2,6 @@
 <robot xmlns:xacro="http://wiki.ros.org/xacro" name="diablo_pluspro">
   <xacro:arg name="prefix" default="" />
   <xacro:arg name="use_tower" default="false" />
-  
   <xacro:property name="sim_env" value="$(arg sim_env)" />
   <xacro:property name="ctrl_mode" value="$(arg ctrl_mode)" />
   <xacro:arg name="yaml_path" default="" />

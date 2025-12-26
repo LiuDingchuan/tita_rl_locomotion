@@ -19,8 +19,9 @@ FSMState_RL::FSMState_RL(std::shared_ptr<ControlFSMData> data)
       output_last(new float[DOF]),
       input_1_temp(new float[temp_history_len_all])
 {
-  cuda_test_ = std::make_shared<CudaTest>("/home/hilabldc/tita_rl/logs/diablo_pluspro/exported/policies/model_gn.engine");
+  // cuda_test_ = std::make_shared<CudaTest>("/home/hilabldc/tita_rl/logs/diablo_pluspro/exported/policies/model_gn.engine");
   // cuda_test_ = std::make_shared<CudaTest>("/home/hilabldc/Desktop/rl_model_engine/sim2sim_success.engine");
+  cuda_test_ = std::make_shared<CudaTest>("/home/hilabldc/robot_lab/model_gn.engine");
   std::cout << "cuda init :" << cuda_test_->get_cuda_init() << std::endl;
 }
 

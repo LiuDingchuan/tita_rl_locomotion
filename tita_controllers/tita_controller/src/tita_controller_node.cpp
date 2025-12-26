@@ -567,8 +567,7 @@ namespace tita_locomotion
 
     update_control_parameters();
 
-    param->dof_chassis = 6; // 这不是在param里面设置过了吗？
-    param->dof_arm = 6;
+    param->dof_chassis = joint_names_.size();
   }
 
   void TitaController::update_control_parameters()
@@ -652,8 +651,8 @@ namespace tita_locomotion
   get_node()->get_parameter<scalar_t>("single_joint_pd2.d", kd[1]);
   get_node()->get_parameter<scalar_t>("single_joint_pd3.p", kp[2]);
   get_node()->get_parameter<scalar_t>("single_joint_pd3.d", kd[2]);
-  // get_node()->get_parameter<scalar_t>("single_joint_pd4.p", kp[3]);
-  // get_node()->get_parameter<scalar_t>("single_joint_pd4.d", kd[3]);
+  get_node()->get_parameter<scalar_t>("single_joint_pd4.p", kp[3]);
+  get_node()->get_parameter<scalar_t>("single_joint_pd4.d", kd[3]);
   param->wbc_joint_kp.resize(8);
   param->wbc_joint_kd.resize(8);
   for(int i = 0; i < 4; ++i) {

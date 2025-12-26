@@ -19,6 +19,9 @@ link_directories(/usr/src/tensorrt-8.6/lib)
 generate_parameter_library(tita_controller_parameters
   src/tita_controller_parameters.yaml
 )
+generate_parameter_library(b1_controller_parameters
+  src/b1_controller_parameters.yaml
+)
 
 pluginlib_export_plugin_description_file(controller_interface tita_controller_plugin.xml)
 
@@ -51,7 +54,7 @@ if(DEBUG)
   target_compile_options(${PROJECT_NAME} PRIVATE -O0 -g)
 endif()
 
-target_link_libraries(tita_controller tita_controller_parameters cudart nvinfer)
+target_link_libraries(tita_controller tita_controller_parameters b1_controller_parameters cudart nvinfer)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

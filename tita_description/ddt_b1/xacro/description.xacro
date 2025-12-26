@@ -78,7 +78,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://tita_description/ddt_b1/meshes/base_link.STL"/>
+          <mesh filename="file://$(find tita_description)/ddt_b1/meshes/base_link.STL"/>
         </geometry>
         <material name="silver"/>
       </visual>
@@ -111,7 +111,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://tita_description/ddt_b1/meshes/L_hip.STL"/>
+          <mesh filename="file://$(find tita_description)/ddt_b1/meshes/L_hip.STL"/>
         </geometry>
         <material name="silver"/>
       </visual>
@@ -135,7 +135,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://tita_description/ddt_b1/meshes/L_thigh.STL"/>
+          <mesh filename="file://$(find tita_description)/ddt_b1/meshes/L_thigh.STL"/>
         </geometry>
         <material name="silver"/>
       </visual>
@@ -165,7 +165,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://tita_description/ddt_b1/meshes/L_calf.STL"/>
+          <mesh filename="file://$(find tita_description)/ddt_b1/meshes/L_calf.STL"/>
         </geometry>
         <material name="silver"/>
       </visual>
@@ -195,9 +195,9 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://tita_description/ddt_b1/meshes/L_foot.STL"/>
+          <mesh filename="file://$(find tita_description)/ddt_b1/meshes/L_foot.STL"/>
         </geometry>
-        <material name="grey"/>
+        <material name="black"/>
       </visual>
       <collision>
         <origin rpy="0 0 0" xyz="0 0 0.0"/>
@@ -225,7 +225,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://tita_description/ddt_b1/meshes/R_hip.STL"/>
+          <mesh filename="file://$(find tita_description)/ddt_b1/meshes/R_hip.STL"/>
         </geometry>
         <material name="silver"/>
       </visual>
@@ -249,7 +249,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://tita_description/ddt_b1/meshes/R_thigh.STL"/>
+          <mesh filename="file://$(find tita_description)/ddt_b1/meshes/R_thigh.STL"/>
         </geometry>
         <material name="silver"/>
       </visual>
@@ -279,7 +279,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://tita_description/ddt_b1/meshes/R_calf.STL"/>
+          <mesh filename="file://$(find tita_description)/ddt_b1/meshes/R_calf.STL"/>
         </geometry>
         <material name="silver"/>
       </visual>
@@ -309,9 +309,9 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://tita_description/ddt_b1/meshes/R_foot.STL"/>
+          <mesh filename="file://$(find tita_description)/ddt_b1/meshes/R_foot.STL"/>
         </geometry>
-        <material name="white"/>
+        <material name="black"/>
       </visual>
       <collision>
         <origin rpy="0 0 0" xyz="0 0 -0.0"/>

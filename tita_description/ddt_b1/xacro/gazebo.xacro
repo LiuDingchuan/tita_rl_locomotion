@@ -6,7 +6,7 @@
     <!-- ================================================================== -->
     
     <!-- IMU Settings -->
-    <xacro:property name="imu_update_rate" value="400.0"/>
+    <xacro:property name="imu_update_rate" value="500.0"/>
     
     <!-- Leg Link Friction (Hip, Thigh, Calf) -->
     <xacro:property name="leg_mu1" value="0.2"/>
@@ -23,13 +23,6 @@
     <!-- ================================================================== -->
     <!--                         Gazebo Plugins                             -->
     <!-- ================================================================== -->
-
-    <!-- ROS2 Control Plugin -->
-    <gazebo>
-      <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
-        <parameters>$(arg yaml_path)</parameters>
-      </plugin>
-    </gazebo>
 
     <!-- IMU Plugin -->
     <gazebo reference="imu_link">
