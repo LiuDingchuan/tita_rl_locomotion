@@ -38,12 +38,10 @@ void FSMState_RL::enter()
       desired_pos[4 * i + 1] = _data->low_state->q[4 * i + 1];
       desired_pos[4 * i + 2] = _data->low_state->q[4 * i + 2];
     }
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < DOF; i++)
     {
-      obs_.dof_pos[i + 4] = _data->low_state->q[i];
-      obs_.dof_vel[i + 4] = _data->low_state->dq[i];
-      obs_.dof_pos[i] = _data->low_state->q[i + 4];
-      obs_.dof_vel[i] = _data->low_state->dq[i + 4];
+      obs_.dof_pos[i] = _data->low_state->q[i];
+      obs_.dof_vel[i] = _data->low_state->dq[i];
     }
   }
   else if (DOF / 2 == 3)
@@ -70,9 +68,9 @@ void FSMState_RL::enter()
   obs_.dof_pos[DOF / 2 - 1] = 0; // 把两个轮子的位置的观察量都置为0
   obs_.dof_pos[DOF - 1] = 0;
 
-  params_.action_scale = 0.5;
+  params_.action_scale = 0.25;
   params_.action_scale_vel = 10.0;
-  params_.hip_scale_reduction = 0.5;
+  params_.hip_scale_reduction = 1.0;
   params_.num_of_dofs = DOF;
   params_.lin_vel_scale = 2.0;
   params_.ang_vel_scale = 0.25;
@@ -138,6 +136,7 @@ void FSMState_RL::enter()
   stop_update_ = false;
 }
 
+// compute torque
 void FSMState_RL::run()
 {
   // _data->state_command->clear();
@@ -154,8 +153,8 @@ void FSMState_RL::run()
   {
     if (i % (DOF / 2) == (DOF / 2 - 1)) // 轮子
     {
-      _data->low_cmd->qd_dot[i] = 20 * desired_pos[i];
-      _data->low_cmd->tau_cmd[i] = 10 * desired_pos[i] - 0.5 * _data->low_state->dq[i];
+      _data->low_cmd->qd_dot[i] = desired_pos[i];
+      _data->low_cmd->tau_cmd[i] = 0.5 * (desired_pos[i] - _data->low_state->dq[i]);
     }
     else // 关节
     {
@@ -211,7 +210,7 @@ void FSMState_RL::_GetObs()
   Vec3<double> base_ang_vel = a_l;
   // a_l = 0.97 * this->_data->state_estimator->getResult().omegaBody + 0.03 * a_l;
   a_l = 1.0 * this->_data->state_estimator->getResult().omegaBody;
-  Vec3<double> projected_gravity = _B2G_RotMat * Vec3<double>(0.0, 0.0, -1.0);
+  Vec3<double> projected_gravity = _G2B_RotMat * Vec3<double>(0.0, 0.0, -1.0);
   Vec3<double> projected_forward = _G2B_RotMat * Vec3<double>(1.0, 0.0, 0.0);
   // gravity
   // _gxFilter->addValue(angvel(0,0));
@@ -286,13 +285,20 @@ void FSMState_RL::_Run_Forward()
 
     if (!stop_update_)
     {
-      for (int i = 0; i < DOF / 2; i++)
+      // for (int i = 0; i < DOF / 2; i++)
+      // {
+      //   obs_.dof_pos[i + DOF / 2] = _data->low_state->q[i];
+      //   obs_.dof_vel[i + DOF / 2] = _data->low_state->dq[i];
+      //   obs_.dof_pos[i] = _data->low_state->q[i + DOF / 2];
+      //   obs_.dof_vel[i] = _data->low_state->dq[i + DOF / 2];
+      // }
+      for (size_t i = 0; i < DOF; i++)
       {
-        obs_.dof_pos[i + DOF / 2] = _data->low_state->q[i];
-        obs_.dof_vel[i + DOF / 2] = _data->low_state->dq[i];
-        obs_.dof_pos[i] = _data->low_state->q[i + DOF / 2];
-        obs_.dof_vel[i] = _data->low_state->dq[i + DOF / 2];
+        /* code */
+        obs_.dof_pos[i] = _data->low_state->q[i];
+        obs_.dof_vel[i] = _data->low_state->dq[i];
       }
+      
       obs_.dof_pos[DOF / 2 - 1] = 0; // 把两个轮子的位置的观察量都置为0
       obs_.dof_pos[DOF - 1] = 0;
 
@@ -318,14 +324,18 @@ void FSMState_RL::_Run_Forward()
       }
       // action[0] *= params_.hip_scale_reduction;
       // action[3] *= params_.hip_scale_reduction;
-      // action[DOF / 2 - 1] = output.get()[DOF / 2 - 1] * params_.action_scale_vel;
-      // action[DOF - 1] = output.get()[DOF - 1] * params_.action_scale_vel;
+      action[DOF / 2 - 1] = output.get()[DOF / 2 - 1] * params_.action_scale_vel;
+      action[DOF - 1] = output.get()[DOF - 1] * params_.action_scale_vel;
       // 换位？左腿换右腿(因为RL里面是反的)
-      for (int i = 0; i < DOF / 2; i++)
+      // for (int i = 0; i < DOF / 2; i++)
+      // {
+      //   desired_pos[i + (DOF / 2)] = action[i];
+      //   desired_pos[i] = action[i + (DOF / 2)];
+      //   // std::cerr << "desired_pos" << i << ":" << desired_pos[i] << std::endl;
+      // }
+      for (int i = 0; i < DOF; i++)
       {
-        desired_pos[i + (DOF / 2)] = action[i];
-        desired_pos[i] = action[i + (DOF / 2)];
-        // std::cerr << "desired_pos" << i << ":" << desired_pos[i] << std::endl;
+        desired_pos[i] = action[i];
       }
       // std::cerr << "des_pos0: " << desired_pos[0]
       //           << " des_pos1: " << desired_pos[1]

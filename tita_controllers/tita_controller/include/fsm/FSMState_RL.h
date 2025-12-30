@@ -74,11 +74,11 @@ private:
   float pitch_cmd_;
 
   // 从RL里面拿到的数据
-  int n_prio = 27;
+  int n_prio = 33;
   int history_len = 10;
-  int n_priv_latent = 30;
-  int temp_history_len_all = 270 - 27;
-  bool use_filter = true;
+  int n_priv_latent = 6;
+  int temp_history_len_all = 330 - 30;
+  bool use_filter = false;
 
   float yaw_vel_cmd_;
 
@@ -95,8 +95,8 @@ private:
   bool threadRunning;
   // float desired_pos[DOF] = {-0.184481302, -1.194677873, 0.0, -0.184481302, -1.194677873, 0.0};
   // float default_dof_pos[DOF] = {-0.184481302, -1.194677873, 0.0, -0.184481302, -1.194677873, 0.0};
-  float desired_pos[DOF] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  float default_dof_pos[DOF] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  float desired_pos[DOF] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  float default_dof_pos[DOF] = {0.0, 0.79, -1.57, 0.0, 0.0, 0.79, -1.57, 0.0};
   // AttitudeData* attitude_ = nullptr;
   // LegData* legdata_ = nullptr;
   // LinearKFPositionVelocityEstimator<float>* posvelest_ = nullptr;
