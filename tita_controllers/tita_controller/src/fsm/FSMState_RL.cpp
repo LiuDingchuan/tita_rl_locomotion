@@ -153,8 +153,8 @@ void FSMState_RL::run()
   {
     if (i % (DOF / 2) == (DOF / 2 - 1)) // 轮子
     {
-      _data->low_cmd->qd_dot[i] = 20 * desired_pos[i];
-      _data->low_cmd->tau_cmd[i] = 10 * desired_pos[i] - 0.5 * _data->low_state->dq[i];
+      _data->low_cmd->qd_dot[i] = desired_pos[i];
+      _data->low_cmd->tau_cmd[i] = 0.5 * (desired_pos[i] - _data->low_state->dq[i]);
     }
     else // 关节
     {
@@ -315,10 +315,8 @@ void FSMState_RL::_Run_Forward()
             action[j] = output.get()[j] * params_.action_scale + params_.default_dof_pos[j];
         }
       }
-      // action[0] *= params_.hip_scale_reduction;
-      // action[3] *= params_.hip_scale_reduction;
-      // action[DOF / 2 - 1] = output.get()[DOF / 2 - 1] * params_.action_scale_vel;
-      // action[DOF - 1] = output.get()[DOF - 1] * params_.action_scale_vel;
+      action[DOF / 2 - 1] = output.get()[DOF / 2 - 1] * params_.action_scale_vel;
+      action[DOF - 1] = output.get()[DOF - 1] * params_.action_scale_vel;
       // 换位？左腿换右腿(因为RL里面是反的)
       for (int i = 0; i < DOF / 2; i++)
       {
